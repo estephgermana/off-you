@@ -93,3 +93,4 @@ const perguntas = [
   };
   
   export default Questionario;
+  
