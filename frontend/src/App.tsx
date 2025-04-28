@@ -1,25 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+// src/App.tsx
 
-function App() {
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import './styles/Header.css';
+
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Questionario from './pages/Questionario';
+import PlanoDeAcao from './pages/PlanoDeAcao'; 
+import RegistroAtividade from './pages/RegistroAtividade' ; 
+
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <Header />
+        <main>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/questionario" element={<Questionario />} />
+            <Route path="/plano-de-acao" element={<PlanoDeAcao />} /> 
+            <Route path="/registro-de-atividades" element={<RegistroAtividade />} />
+
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </Router>
   );
 }
 

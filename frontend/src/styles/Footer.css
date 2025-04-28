@@ -1,0 +1,57 @@
+/* src/styles/Footer.css */
+.footer {
+    background-color: white;
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid #ccc;
+  }
+  
+  .footer-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    flex-direction: column;
+  }
+  
+  .footer-buttons {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .footer-links {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .footer-contacts {
+    margin-top: 20px;
+    text-align: left;
+  }
+  
+  .footer-links a,
+  .footer-buttons button,
+  .footer-contacts span {
+    color: #94749e;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .footer-links a:hover,
+  .footer-buttons button:hover {
+    text-decoration: underline;
+  }
+  
+  .btn {
+    background-color: transparent;
+    border: 2px solid #94749e;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+  
+  .footer-contacts span {
+    font-size: 14px;
+  }
+  
