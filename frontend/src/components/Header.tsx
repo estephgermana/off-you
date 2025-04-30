@@ -13,7 +13,6 @@ const Header: React.FC = () => {
           <input type="text" placeholder="Buscar..." />
         </div>
         <div>
-          <button className="login-button">Login</button>
           <Link  to="/login"><button>Login</button></Link>
         </div>
       </div>

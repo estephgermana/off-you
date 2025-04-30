@@ -1,15 +1,16 @@
 .questionario {
-  max-width: 600px;
-  margin: 20px auto;
+  max-width: 700px;
+  margin: 40px auto;
   padding: 20px;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+  background: #f8f8ff;
+  border-radius: 10px;
+  font-family: Arial, sans-serif;
 }
 
 h2 {
-  font-size: 20px;
-  color: #253173;
+  font-size: 24px;
   margin-bottom: 20px;
+  color: #253173;
 }
 
 .alternativas {
@@ -20,20 +21,21 @@ h2 {
   display: block;
   margin: 10px 0;
   font-size: 16px;
-  cursor: pointer;
 }
 
 .alternativa input {
   margin-right: 10px;
 }
 
-.alternativa.selecionada {
+.selecionada {
+  font-weight: bold;
   color: #253173;
 }
 
 .botoes {
   display: flex;
   justify-content: space-between;
+  margin-top: 20px;
 }
 
 button {
@@ -41,9 +43,9 @@ button {
   color: white;
   border: none;
   padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
+  border-radius: 8px;
   font-size: 16px;
+  cursor: pointer;
 }
 
 button:disabled {
@@ -52,8 +54,17 @@ button:disabled {
 }
 
 .resultado {
-  text-align: center;
-  font-size: 18px;
-  color: #253173;
+  padding: 20px;
+  text-align: left;
 }
 
+.resultado ul {
+  list-style: disc;
+  padding-left: 20px;
+}
+
+.frase-final {
+  margin: 20px 0;
+  font-style: italic;
+  color: #333;
+}
