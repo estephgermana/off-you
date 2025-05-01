@@ -13,16 +13,32 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "pg": "^8.15.6"
+    "jsonwebtoken": "^9.0.2",
+    "knex": "^3.1.0",
+    "pg": "^8.15.6",
+    "uuid": "^11.1.0",
+    "yup": "^1.6.1"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/knex": "^0.16.1",
     "@types/node": "^22.15.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
+  },
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    }
   }
 }
