@@ -1,0 +1,26 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "API do OffYou",
+        "summary": "",
+        "description": "",
+        "contact": {
+            "url": "https://github.com/estephgermana/off-you/",
+            "email": "manuellafigueiredojatoba@gmail.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3003/v1",
+            "description": "API de test"
+        },
+        {
+            "url": "",
+            "description": "API de Produção"
+        }
+    ],
+    "paths": {
+        
+    }
+}

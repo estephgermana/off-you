@@ -1,0 +1,59 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.atualizarPlanoUsuario = void 0;
+const connection_1 = __importDefault(require("../../connection"));
+const Authenticator_1 = require("../../services/midleware/Authenticator");
+const atualizarPlanoUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
+            return res.status(401).json({ message: 'Acesso não autorizado' });
+        }
+        const token = authHeader.split(' ')[1];
+        const auth = new Authenticator_1.Authenticator();
+        const tokenData = auth.getTokenData(token);
+        if (tokenData.tipo !== 'adm') {
+            return res.status(403).json({ message: 'Acesso negado' });
+        }
+        const { id_usuario } = req.params;
+        const { id_servico } = req.body;
+        const servico = yield (0, connection_1.default)('servicos').where('id_servico', id_servico).first();
+        if (!servico) {
+            return res.status(404).json({ message: 'Serviço não encontrado para o id_servico fornecido.' });
+        }
+        const usuario = yield (0, connection_1.default)('usuario').where('id_usuario', id_usuario).first();
+        if (!usuario) {
+            return res.status(404).json({ message: 'Usuário não encontrado.' });
+        }
+        if (usuario.nome_plano === null) {
+            yield (0, connection_1.default)('usuario').where('id_usuario', id_usuario).update({
+                nome_plano: servico.nome_plano,
+                saldo: connection_1.default.raw('saldo + 10')
+            });
+        }
+        else {
+            yield (0, connection_1.default)('usuario').where('id_usuario', id_usuario).update({
+                nome_plano: servico.nome_plano
+            });
+        }
+        res.status(200).json({ message: 'Plano do usuário atualizado com sucesso.' });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).send('Ocorreu um erro inesperado ao atualizar o plano do usuário.');
+    }
+});
+exports.atualizarPlanoUsuario = atualizarPlanoUsuario;
+//# sourceMappingURL=atualizarPlanoUsuario.js.map
