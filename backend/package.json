@@ -1,44 +1,45 @@
 {
-  "name": "off_you",
+  "name": "squad-10-exmed",
   "version": "1.0.0",
-  "description": "A gente direciona e você apoia quem ama.",
-  "main": "src/server.ts",
+  "description": "Um sistema que facilite a visualização dos serviços oferecidos e ajude a garantir a fidelidade dos clientes atuais ao mesmo tempo que alcança novos de uma forma atrativa, em que os usuários vejam benefícios claros, assim ampliando a venda da solução.",
+  "main": "src/app.ts",
   "scripts": {
-    "dev": "ts-node-dev src/server.ts",
+    "dev": "ts-node-dev ./src/app.ts",
     "build": "tsc",
-    "start": "tsc && node build/server.ts",
+    "start": "tsc && node ./build/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/uuid": "^9.0.8",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.5"
+  },
   "dependencies": {
-    "bcryptjs": "^3.0.2",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/knex": "^0.16.1",
+    "@types/swagger-ui-express": "^4.1.6",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0",
+    "custom-env": "^2.0.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "knex": "^3.1.0",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.10.0",
     "pg": "^8.15.6",
-    "uuid": "^11.1.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
+    "ts-node": "^10.9.2",
+    "uuid": "^9.0.0",
     "yup": "^1.6.1"
-  },
-  "devDependencies": {
-    "@types/bcryptjs": "^3.0.0",
-    "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.1",
-    "@types/jsonwebtoken": "^9.0.9",
-    "@types/knex": "^0.16.1",
-    "@types/node": "^22.15.2",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.8.3"
-  },
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    }
   }
 }
