@@ -1,16 +1,18 @@
-// src/pages/Home.tsx
-
 import React from 'react';
 import { Link } from 'react-router-dom';
+import '../styles/Home.css'; 
 
 const Home: React.FC = () => {
   return (
     <div className="home-page">
-      <h1>Descubra se quem você ama precisa de ajuda para se conectar com a vida real.</h1>
-      <h3>Nós te guiamos nesse percurso.</h3>
-      <button>
-        <Link to="/questionario">Responda o Questionário</Link>
-      </button>
+      <div className="questionario-box">
+        <h1>Descubra se quem você ama precisa de ajuda para se conectar com a vida real.</h1>
+        <h3>Nós te guiamos nesse percurso.</h3>
+        <Link to="/questionario">
+          <button className="start-button">Responda o Questionário</button>
+        </Link>
+        
+      </div>
       
       <div className="sobre-offyou">
         <h2>Sobre OffYou</h2>

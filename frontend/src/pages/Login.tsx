@@ -1,7 +1,8 @@
-// src/pages/Login.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/Login.css'; // ajuste o caminho conforme a estrutura do seu projeto
+import { Link } from 'react-router-dom';
+
+import '../styles/Login.css';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -12,61 +13,46 @@ const Login: React.FC = () => {
     console.log('Logado com sucesso!', email);
   };
 
-  const handleEsqueceuSenha = () => {
-    navigate('/recuperar-senha');
-  };
-
-  const handleCadastro = () => {
-    navigate('/cadastro');
-  };
-
   return (
-   
-      <div className="border-container-login">
-        <div className="container-login">
-          <h1>Login</h1>
+    <div className="login-wrapper">
+      <div className="login-box">
+        <h1>Login</h1>
 
-          <form className="container-email-senha">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              placeholder="Digite seu email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+        <form className="login-form" onSubmit={(e) => e.preventDefault()}>
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="Digite seu email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
 
-            <label htmlFor="senha">Senha</label>
-            <input
-              type="password"
-              id="senha"
-              placeholder="Digite sua senha"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-            />
+          <label htmlFor="senha">Senha</label>
+          <input
+            type="password"
+            id="senha"
+            placeholder="Digite sua senha"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+            required
+          />
 
-            {/* Botão Entrar */}
-            <button
-              type="button"
-              className="submit"
-              onClick={handleLogin}
-            >
-              Entrar
-            </button>
-          </form>
+          <button type="submit" onClick={handleLogin}>
+            Entrar
+          </button>
+        </form>
 
-          <p>
-            <button onClick={handleEsqueceuSenha} style={{ background: 'none', border: 'none', color: 'blue', cursor: 'pointer' }}>
-              Esqueceu a senha?
-            </button>
-          </p>
-          <p>
-            <button onClick={handleCadastro} style={{ background: 'none', border: 'none', color: 'blue', cursor: 'pointer' }}>
-              Não tem login? Cadastre-se
-            </button>
-          </p>
+          <div className="login-link-cadastro">
+          Já tem conta? <Link to="/cadastro">Faça cadastro</Link>
+        </div>
+          <div className="login-link-recpera">
+          Já tem conta? <Link to="/recuperar-senha">Esqueci a senha</Link>
         </div>
       </div>
+    </div>
   );
-}
+};
+
 export default Login;

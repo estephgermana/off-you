@@ -1,57 +1,45 @@
-/* src/styles/Footer.css */
-.footer {
-    background-color: white;
-    padding: 20px;
-    text-align: center;
-    border-top: 1px solid #ccc;
-  }
-  
-  .footer-content {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 30px;
-    flex-direction: column;
-  }
-  
-  .footer-buttons {
-    display: flex;
-    gap: 15px;
-  }
-  
-  .footer-links {
-    display: flex;
-    gap: 15px;
-  }
-  
-  .footer-contacts {
-    margin-top: 20px;
-    text-align: left;
-  }
-  
-  .footer-links a,
-  .footer-buttons button,
-  .footer-contacts span {
-    color: #94749e;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  
-  .footer-links a:hover,
-  .footer-buttons button:hover {
-    text-decoration: underline;
-  }
-  
-  .btn {
-    background-color: transparent;
-    border: 2px solid #94749e;
-    padding: 10px 20px;
-    cursor: pointer;
-    border-radius: 5px;
-    font-weight: bold;
-  }
-  
-  .footer-contacts span {
-    font-size: 14px;
-  }
-  
+footer {
+  background-color: white;
+  color: #94749e; /* Cor rosa */
+  padding: 20px 0;
+  text-align: center;
+}
+
+footer .footer-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+footer .footer-buttons button {
+  background-color: transparent;
+  color: #94749e;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+footer .footer-buttons button:hover {
+  color: #253173; 
+}
+
+footer .footer-info {
+  display: flex;
+  justify-content: center;
+  flex-direction: column; /* <-- Essa linha faz a mágica */
+  align-items: center;
+  gap: 5px;
+}
+
+footer .footer-info div {
+  display: flex;
+  flex-direction: column;
+}
+
+footer .footer-info div p {
+  color: #94749e;
+  font-size: 1rem;
+  text-decoration: none;
+}

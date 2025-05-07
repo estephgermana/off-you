@@ -1,6 +1,7 @@
 // src/pages/Cadastro.tsx
 import React, { useState } from 'react';
-import '../styles/Cadastro.css'; // Crie esse CSS ou aproveite o que já tem
+import { Link } from 'react-router-dom'; 
+import '../styles/Cadastro.css';
 
 const Cadastro: React.FC = () => {
   const [nome, setNome] = useState('');
@@ -10,24 +11,16 @@ const Cadastro: React.FC = () => {
   const [error, setError] = useState('');
 
   const handleCadastro = () => {
-    // Verificar se todos os campos foram preenchidos
     if (!nome || !email || !senha || !confirmarSenha) {
       setError('Por favor, preencha todos os campos.');
       return;
     }
-
-    // Verificar se as senhas coincidem
     if (senha !== confirmarSenha) {
       setError('As senhas não coincidem.');
       return;
     }
-
-    // Limpar erro caso tudo esteja correto
     setError('');
-
-    // Cadastro realizado com sucesso (substitua por lógica real, como uma chamada à API)
     console.log('Cadastro realizado:', { nome, email });
-    // Aqui você pode chamar uma API ou redirecionar o usuário
   };
 
   return (
@@ -81,6 +74,10 @@ const Cadastro: React.FC = () => {
             Cadastrar
           </button>
         </form>
+
+        <div className="login-link">
+          Já tem conta? <Link to="/login">Faça login</Link>
+        </div>
       </div>
     </div>
   );

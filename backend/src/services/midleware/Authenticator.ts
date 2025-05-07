@@ -5,7 +5,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Garantir que a variável de ambiente esteja definida
 const SECRET_KEY: string = process.env.JWT_SECRET_KEY!;
 
 if (!SECRET_KEY) {

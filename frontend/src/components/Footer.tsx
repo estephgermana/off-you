@@ -1,16 +1,22 @@
+// src/components/Footer.tsx
+
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../styles/Footer.css'; 
+import '../styles/Footer.css';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="footer">
-      <div className="footer-content">
-        <div className="footer-buttons">
-          <Link to="/" className="footer-btn">Início do Site</Link>
-          <Link to="/politicas-de-privacidade" className="footer-btn">Políticas de Privacidade</Link>
-          <a href="email:contato@offyou.com" className="footer-btn">contato@offyou.com</a> {/* Corrigido */}
-          <a href="telefone:+XXXXXXXXXXXX" className="footer-btn">(XX) XXXX-XXXX</a> {/* Corrigido */}
+    <footer>
+      <div className="footer-buttons">
+        <Link to="/"><button>Início do Site</button></Link>
+        <Link to="/"><button>Políticas de Privacidade</button></Link>
+        
+      </div>
+
+      <div className="footer-info">
+        <div>
+          <p>contato@offyou.com</p>
+          <p>Telefone::+5511999999999</p>
         </div>
       </div>
     </footer>
