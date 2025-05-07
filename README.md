@@ -1,43 +1,79 @@
+
 # OffYou - Projeto
 
-O **OffYou** é uma aplicação que envolve um questionário, plano de ação, atividades e conquistas, com uma interface gamificada, feita utilizando **React.js** para o front-end, **Node.js** com **TypeScript** para o back-end, e **PostgreSQL** como banco de dados.
+Este repositório é dedicado à disciplina de Tópicos Integradores.
 
-## Tecnologias Utilizadas
+OffYou é uma aplicação cvoltada para amigos e familiares de adolescentes com dependência em internet. O objetivo é oferecer suporte por meio de um plano de ação, atividades e sistema de conquistas, incentivando o acompanhamento e a construção de hábitos mais saudáveis.
+---
 
-- **Frontend**: React.js
-- **Backend**: Node.js + TypeScript
-- **Banco de Dados**: PostgreSQL
-- **Integração**: APIs REST com comunicação entre front-end e back-end
-- **Hospedagem**: Vercel (front-end), Railway (back-end e banco de dados)
+## 🛠 Tecnologias Utilizadas
 
-##  Como Rodar o Projeto
+* **Frontend:** React.js
+* **Backend:** Node.js + TypeScript
+* **Banco de Dados:** PostgreSQL
+* **Integração:** APIs REST para comunicação entre front-end e back-end
+* **Hospedagem:** Vercel (frontend), Railway (backend e banco de dados)
+
+---
+
+## 🚀 Como Rodar o Projeto
 
 ### 1. Clonar o Repositório
-
-Primeiro, clone o repositório em sua máquina local.
 
 ```bash
 git clone https://github.com/estephgermana/OffYou.git
 cd OffYou
+```
 
+### 2. Rodar o Frontend
 
+```bash
+cd frontend
+npm install
+npm start
+```
 
-### Testando a Aplicação
-Frontend: Acesse http://localhost:3001 para visualizar a interface.
+### 3. Rodar o Backend
 
-Backend: Acesse http://localhost:3000 para ver a API (caso tenha rotas configuradas).
+> Certifique-se de configurar as variáveis de ambiente antes de iniciar.
 
-## Funcionalidades
+```bash
+cd backend
+npm install
+npm run dev
+```
 
-Tela Inicial: Mostra os botões para o questionário e a seção sobre o "OffYou".
+---
 
-Questionário: Usuário preenche um questionário.
+## ✅ Testando a Aplicação
 
-Plano de Ação: Gerado a partir das respostas do questionário.
+* **Frontend:** Acesse [http://localhost:3001](http://localhost:3001)
+* **Backend:** Acesse [http://localhost:3000](http://localhost:3000) (caso haja rotas configuradas)
 
-Atividades: Exibidas de acordo com o plano de ação.
+---
 
-Conquistas: O usuário ganha estrelas conforme conclui atividades.
+## 💡 Funcionalidades
 
-Login e Cadastro: Necessário para acessar o plano de ação e atividades.
+* **Tela Inicial:** Exibe botões para o questionário e informações sobre o projeto.
+* **Questionário:** O usuário responde a perguntas baseadas em seu perfil.
+* **Plano de Ação:** Gerado automaticamente com base nas respostas.
+* **Atividades:** Exibidas conforme o plano de ação gerado.
+* **Conquistas:** Usuário ganha estrelas conforme conclui atividades.
+* **Login e Cadastro:** Necessários para acessar funcionalidades personalizadas.
+
+---
+
+## 👥 Integrantes da Equipe
+
+* **Amanda Lima**
+  GitHub: [amandaklima](https://github.com/amandaklima)
+  Email: [nandakolima@gmail.com](mailto:nandakolima@gmail.com)
+
+* **Estephani Germana**
+  GitHub: [estephgermana](https://github.com/estephgermana)
+  Email: 
+
+* **Manuella Jatobá**
+  GitHub: 
+  Email: 
 
