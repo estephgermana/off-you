@@ -135,7 +135,7 @@ export default function PlanoDeAcao() {
 
       <div className="botoes">
         <button onClick={salvarProgresso}>Salvar progresso</button>
-        <Link to="/registro-atividade">
+        <Link to="/registro-de-atividades">
           <button>Ver Progresso</button>
         </Link>
       </div>

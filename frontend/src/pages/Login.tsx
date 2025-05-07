@@ -1,7 +1,7 @@
 // src/pages/Login.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/Login.css'; // ajuste o caminho conforme a estrutura do seu projeto
+import '../styles/Login.css'; 
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
