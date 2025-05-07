@@ -1,4 +1,3 @@
-// src/components/Footer.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/Footer.css'; 
@@ -10,13 +9,8 @@ const Footer: React.FC = () => {
         <div className="footer-buttons">
           <Link to="/" className="footer-btn">Início do Site</Link>
           <Link to="/politicas-de-privacidade" className="footer-btn">Políticas de Privacidade</Link>
-          <Link to="/cnpj" className="footer-btn">CNPJ</Link>
-        </div>
-        
-        <div className="footer-contact">
-          <p>Contatos</p>
-          <p>Telefone: (XX) XXXX-XXXX</p>
-          <p>Email: contato@offyou.com</p>
+          <a href="email:contato@offyou.com" className="footer-btn">contato@offyou.com</a> {/* Corrigido */}
+          <a href="telefone:+XXXXXXXXXXXX" className="footer-btn">(XX) XXXX-XXXX</a> {/* Corrigido */}
         </div>
       </div>
     </footer>
