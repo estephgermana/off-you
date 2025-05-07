@@ -67,9 +67,7 @@ header .green-bar-buttons {
 header .green-button {
   background-color: transparent;
   color: white;
-  border: 1px solid white;
   padding: 4px 10px;
-  border-radius: 5px;
   font-size: 0.8rem;
   height: 30px;
   display: flex;
@@ -82,6 +80,6 @@ header .green-button {
 }
 
 header .green-button:hover {
-  background-color: white;
+  background-color: rgb(124, 150, 124);
   color: #253173;
 }

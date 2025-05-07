@@ -1,151 +1,74 @@
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  background-color: #f4f4f4;
+  padding-top: 60px;
+  padding-inline: 20px;
+}
 
-.container-login{
-    width: 80vw !important;
-    height: auto !important;
-    padding-bottom: 6vw !important;
-  
-  }
-  .container-email-senha{
-  
-    width: 55vw !important;
-  
-  }
-  .toggle-password {
-    left: 62vw !important;
-    bottom: 4vw !important;
-  }
-  .toggle-password img{
-    width: 5vw !important;
-  }
-  .container-email-senha {
-    width: 90% !important;
-    margin: 4vw !important;
-  
-  
-  }
-  .container-email-senha input{
-    width: 100% !important;
-  height: 10vw !important;
-  padding: 0vw 2vw !important;
-  font-size: 3vw !important;
-  
-  }
-  .container-email-senha label{
-    font-size: 3vw !important;
-  }
-  .container-login .submit{
-    width: 55vw !important;
-    height: 10vw !important;
-    font-size: 4vw !important;
-  
-  }
-  .container-login p, a{
-    font-size: 3vw !important;
-    margin-top: 3vw !important;
-  }
-  
+.login-box {
+  background-color: #fff;
+  padding: 32px;
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
 
-  
-  .container-all-login{
-    margin-top: 6vw;
-    display:flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-   }
-   
-   .logo-container{
-       width: 12vw;
-       height: 5vw;
-       background-color: #0b42ce;
-       border-radius: 15px;
-       margin: 0vw 0vw 2vw 0vw;
-       display: flex;
-       align-items: center;
-       justify-content: center;
-   }
-   .logo-container img{
-    height: 90%;
-  
-   }
-   .container-login{
-       width: 35vw;
-       height: 28vw;
-       border-radius: 35px;
-       background-color: white;
-       display: flex;
-       flex-direction: column;
-       align-items: center;
-       justify-content: center;
-   }
-   .container-email-senha{
-       display: flex;
-       flex-direction: column;
-       align-items: left;
-       justify-content: center;
-       width: 30vw;
-       position: relative;
-   }
-   .container-email-senha input{
-       width: 100%;
-     border: 1px solid #0b42ce;
-     border-radius: 15px;
-     height: 3vw;
-     margin: 0.5vw 0vw;
-     margin-bottom: 2vw;
-     transition: 0.5s;
-     font-family: Montserrat-regular;
-     font-size: 1.0vw;
-     padding: 0vw 1vw;
-     box-sizing: border-box;
-  
-   }
-   .container-email-senha input:nth-of-type(2){
-    width: 90%;
-  }
-   .container-email-senha input:focus{
-       outline: none;
-       border: 1px solid #020e2b;
-       transition: 0.5s;
-     }
-   .container-email-senha label{
-       font-family: Montserrat-Bold;
-       font-size: 1.3vw;
-       margin: 0.5vw 1vw;
-   }
-   .container-login .submit{
-     width: 22vw;
-     height: 3vw;
-     background: linear-gradient( to bottom, #0b42ce,#062168); 
-     border: none;
-     border-radius: 15px;
-     color: white;
-     font-family: Montserrat-Bold;
-     font-size: 1.5vw;
-     cursor: pointer;
-     transition: 1s;
-     margin-top: -0.5vw;
-     margin-bottom: 0.5vw;
-   }
-   .container-login button:focus{
-       transition: 1s;
-       background: white;
-       color: #0b42ce ;
-     }
-     .container-login p, a{
-       font-family: Montserrat-regular;
-       font-size: 1vw;
-       margin-top: 0.5vw;
-       margin-bottom: 0vw;
-     }
-    .toggle-password{
-      position: absolute;
-      background-color: white;
-      bottom: 3vw;
-      left: 28.5vw;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+.login-box h1 {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form label {
+  margin-top: 12px;
+  font-weight: bold;
+}
+
+.login-form input {
+  padding: 10px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.login-form button {
+  margin-top: 24px;
+  background-color: #7a6283;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.login-form button:hover {
+  background-color: #b575a1;
+}
+
+.login-link-cadastro,
+.login-link-recpera {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.login-link-cadastro a,
+.login-link-recpera a {
+  color: #7a6283;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.login-link-cadastro a:hover,
+.login-link-recpera a:hover {
+  text-decoration: underline;
+}
