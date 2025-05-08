@@ -5,7 +5,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Garantir que a variável de ambiente esteja definida
 const SECRET_KEY: string = process.env.JWT_SECRET_KEY!;
 
 if (!SECRET_KEY) {
@@ -13,12 +12,12 @@ if (!SECRET_KEY) {
 }
 
 export class Authenticator {
-    generateToken(info: AuthenticationData): string {
+    generateToken(info: AuthenticationData, expiresIn: string = "12h"): string {
         try {
             const token = jwt.sign(
                 { id_usuario: info.id_usuario, tipo: info.tipo },
                 SECRET_KEY,
-                { expiresIn: "12h" }
+                { expiresIn }
             );
             return token;
         } catch (error) {
@@ -37,7 +36,6 @@ export class Authenticator {
         }
     }
 }
-
 export class HashManager {
     public async hash(text: string): Promise<string> {
         const rounds = Number(process.env.BCRYPT_COST) || 10;

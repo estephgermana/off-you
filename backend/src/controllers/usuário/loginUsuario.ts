@@ -3,7 +3,6 @@ import knex from '../../connection';
 import { Authenticator, HashManager } from '../../services/midleware/Authenticator';
 import * as yup from 'yup';
 
-// Validação do schema para o login
 const schemaLogin = yup.object({
   email: yup.string().email('Formato de email inválido.').required('Email é obrigatório.'),
   senha: yup.string().required('Senha é obrigatória.'),
