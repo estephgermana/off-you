@@ -11,7 +11,8 @@ const Login: React.FC = () => {
 
   const handleLogin = () => {
     console.log('Logado com sucesso!', email);
-  };
+    navigate('/');
+};
 
   return (
     <div className="login-wrapper">
@@ -51,7 +52,7 @@ const Login: React.FC = () => {
           Esqueceu a senha? <Link to="/recuperar-senha">Esqueci a senha</Link>
         </div>
       </div>
-      
+
     </div>
   );
 };

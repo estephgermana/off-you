@@ -117,9 +117,10 @@ const Questionario: React.FC = () => {
             ))}
           </ul>
           <p className="frase-final">Confira sugestões de atividades mais completas para ajudar seu amigo ou familiar:</p>
-          <Link to="/plano-de-acao">
-              <button>Ver Plano de Ação</button>
+          <Link to="/cadastro">
+            <button>Cadastre-se para ver o Plano de Ação</button>
           </Link>
+
 
         </div>
       ) : (

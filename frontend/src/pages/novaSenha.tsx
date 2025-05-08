@@ -12,7 +12,7 @@ const NovaSenha: React.FC = () => {
   const navigate = useNavigate();
 
   const handleNovaSenha = () => {
-    if (!token || !novaSenha || !confirmarNovaSenha) {
+    if ( !novaSenha || !confirmarNovaSenha) {
       setMessage('Por favor, preencha todos os campos.');
       return;
     }
@@ -22,7 +22,6 @@ const NovaSenha: React.FC = () => {
       return;
     }
 
-    console.log('Token recebido:', token);
     console.log('Nova senha:', novaSenha);
     setMessage('Senha alterada com sucesso!');
     

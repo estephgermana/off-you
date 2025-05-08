@@ -54,22 +54,41 @@ export default function PlanoDeAcao() {
   const [indexAtual, setIndexAtual] = useState(0);
   const [atividadesFeitas, setAtividadesFeitas] = useState<boolean[]>([]);
   const [comentarios, setComentarios] = useState<string[]>([]);
+  const [avaliacoes, setAvaliacoes] = useState<number[]>([]);
 
   useEffect(() => {
-    setAtividadesFeitas(new Array(planoAtual.atividades.length).fill(false));
-    setComentarios(new Array(planoAtual.atividades.length).fill(""));
+    const registros = JSON.parse(localStorage.getItem("registros") || "[]");
+    const progressoAtual = registros.find((r: any) => r.grau === grauDependencia);
+    if (progressoAtual) {
+      setAtividadesFeitas(progressoAtual.atividades.map((a: any) => a.feita));
+      setComentarios(progressoAtual.atividades.map((a: any) => a.comentario));
+      setAvaliacoes(progressoAtual.atividades.map((a: any) => a.avaliacao || 0));
+    } else {
+      setAtividadesFeitas(new Array(planoAtual.atividades.length).fill(false));
+      setComentarios(new Array(planoAtual.atividades.length).fill(""));
+      setAvaliacoes(new Array(planoAtual.atividades.length).fill(0));
+    }
   }, [planoAtual]);
 
   const toggleAtividade = () => {
     const novas = [...atividadesFeitas];
     novas[indexAtual] = !novas[indexAtual];
     setAtividadesFeitas(novas);
+    salvarProgresso();
   };
 
   const atualizarComentario = (texto: string) => {
     const novos = [...comentarios];
     novos[indexAtual] = texto;
     setComentarios(novos);
+    salvarProgresso();
+  };
+
+  const atualizarAvaliacao = (nota: number) => {
+    const novas = [...avaliacoes];
+    novas[indexAtual] = nota;
+    setAvaliacoes(novas);
+    salvarProgresso();
   };
 
   const salvarProgresso = () => {
@@ -79,13 +98,15 @@ export default function PlanoDeAcao() {
         texto: a,
         feita: atividadesFeitas[i],
         comentario: comentarios[i],
+        avaliacao: avaliacoes[i],
       })),
       data: new Date().toLocaleString(),
     };
     const registros = JSON.parse(localStorage.getItem("registros") || "[]");
-    registros.push(registro);
+    const index = registros.findIndex((r: any) => r.grau === grauDependencia);
+    if (index !== -1) registros[index] = registro;
+    else registros.push(registro);
     localStorage.setItem("registros", JSON.stringify(registros));
-    alert("Progresso salvo!");
   };
 
   return (
@@ -94,52 +115,44 @@ export default function PlanoDeAcao() {
       <h4>{planoAtual.descricao}</h4>
 
       <div className="atividade-box">
-        <button
-          className="seta-esquerda"
-          onClick={() => setIndexAtual(indexAtual - 1)}
-          disabled={indexAtual === 0}
-        >
-          ⬅
-        </button>
-        <div className="atividade-titulo">
-          {planoAtual.atividades[indexAtual]}
-        </div>
-        <button
-          className="seta-direita"
-          onClick={() => setIndexAtual(indexAtual + 1)}
-          disabled={indexAtual === planoAtual.atividades.length - 1}
-        >
-          ➡
-        </button>
+        <button onClick={() => setIndexAtual(indexAtual - 1)} disabled={indexAtual === 0}>⬅</button>
+        <div className="atividade-titulo">{planoAtual.atividades[indexAtual]}</div>
+        <button onClick={() => setIndexAtual(indexAtual + 1)} disabled={indexAtual === planoAtual.atividades.length - 1}>➡</button>
       </div>
 
-      <div className="atividade-detalhe">
+      <div className="atividade-detalhe" style={{ marginBottom: "16px" }}>
         <label>
-          <input
-            type="checkbox"
-            checked={atividadesFeitas[indexAtual]}
-            onChange={toggleAtividade}
-          />
+          <input type="checkbox" checked={atividadesFeitas[indexAtual]} onChange={toggleAtividade} />
           Marcar como concluída
         </label>
       </div>
+     
+      {atividadesFeitas[indexAtual] && (
+        <>
+          <div className="avaliacao-box" style={{ marginBottom: "16px" }}>
+            <label>Avalie a atividade:</label>
+            <div className="avaliacao-botoes">
+              {[1, 2, 3, 4, 5].map((nota) => (
+                <button key={nota} className={avaliacoes[indexAtual] === nota ? "selecionado" : ""} onClick={() => atualizarAvaliacao(nota)}>{nota}</button>
+              ))
+            }
+            </div>
+          </div>
 
-      <div className="comentario-box">
-        <label>Fale mais sobre sua experiência:</label>
-        <textarea
-          value={comentarios[indexAtual]}
-          onChange={(e) => atualizarComentario(e.target.value)}
-          placeholder="Escreva sua experiência com essa atividade..."
-        />
-      </div>
+          <div className="comentario-box">
+            <label>Fale mais sobre a experiência da Vitima:</label>
+            <textarea
+              value={comentarios[indexAtual]}
+              onChange={(e) => atualizarComentario(e.target.value)}
+              placeholder="Escreva sua experiência com essa atividade..."
+            />
+          </div>
+        </>
+      )}
 
       <div className="botoes">
-        <button onClick={salvarProgresso} disabled={!atividadesFeitas[indexAtual]}>
-          Salvar progresso
-        </button>
-        <Link to="/registro-de-atividades">
-          <button>Ver Progresso</button>
-        </Link>
+        <button onClick={salvarProgresso} disabled={!atividadesFeitas[indexAtual]}>Salvar progresso</button>
+        <Link to="/registro-de-atividades"><button>Ver Progresso</button></Link>
       </div>
     </div>
   );

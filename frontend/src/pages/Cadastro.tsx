@@ -1,6 +1,5 @@
-// src/pages/Cadastro.tsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; 
+import { Link, useNavigate } from 'react-router-dom'; 
 import '../styles/Cadastro.css';
 
 const Cadastro: React.FC = () => {
@@ -11,6 +10,9 @@ const Cadastro: React.FC = () => {
   const [confirmarSenha, setConfirmarSenha] = useState('');
   const [error, setError] = useState('');
   const [tipoUsuario, setTipoUsuario] = useState('familiar');
+
+  // Criando o navigate
+  const navigate = useNavigate();
 
   const handleCadastro = () => {
     if (!nome || !email || !senha || !confirmarSenha) {
@@ -23,6 +25,7 @@ const Cadastro: React.FC = () => {
     }
     setError('');
     console.log('Cadastro realizado:', { nome, email });
+    navigate('/'); // Redirecionando para a Home
   };
 
   return (
@@ -46,7 +49,7 @@ const Cadastro: React.FC = () => {
             <option value="amigo">Amigo</option>
           </select>
 
-           <label htmlFor="dataNascimento">Data de Nascimento da Vitima</label>
+          <label htmlFor="dataNascimento">Data de Nascimento da Vítima</label>
           <input
             type="date"
             id="dataNascimento"
