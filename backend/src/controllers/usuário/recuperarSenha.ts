@@ -51,6 +51,7 @@ export const recuperarSenhaUsuario = async (req: Request, res: Response) => {
       message: 'Token de recuperação gerado e enviado por e-mail.',
     });
   } catch (error: any) {
+    console.error(error);
     if (error instanceof yup.ValidationError) {
       return res.status(400).json({ message: 'Erro de validação', errors: error.errors });
     }
