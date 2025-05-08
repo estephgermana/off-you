@@ -45,12 +45,13 @@ const Login: React.FC = () => {
         </form>
 
           <div className="login-link-cadastro">
-          Já tem conta? <Link to="/cadastro">Faça cadastro</Link>
+          Não tem conta? <Link to="/cadastro">Faça cadastro</Link>
         </div>
           <div className="login-link-recpera">
-          Já tem conta? <Link to="/recuperar-senha">Esqueci a senha</Link>
+          Esqueceu a senha? <Link to="/recuperar-senha">Esqueci a senha</Link>
         </div>
       </div>
+      
     </div>
   );
 };

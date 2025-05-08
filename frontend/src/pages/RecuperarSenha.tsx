@@ -17,6 +17,9 @@ const RecuperarSenha: React.FC = () => {
 
     console.log('Enviando link de recuperação para o e-mail:', email);
     setMessage('Link de recuperação enviado para o seu e-mail.');
+
+    // Redirecionar para a página onde o usuário vai digitar o token
+    navigate('/nova-senha'); // Aqui você define a rota para a nova tela
   };
 
   return (
@@ -45,13 +48,12 @@ const RecuperarSenha: React.FC = () => {
           </button>
         </form>
 
-         <div className="login-link">
-                  Já tem conta? <Link to="/login">Faça login</Link>
-                </div>
-          <div className="login-link-cadastro">
-                    Já tem conta? <Link to="/cadastro">Faça cadastro</Link>
-                  </div>
-        
+        <div className="login-link">
+          Já tem conta? <Link to="/login">Faça login</Link>
+        </div>
+        <div className="login-link-cadastro">
+          Não tem conta? <Link to="/cadastro">Faça cadastro</Link>
+        </div>
       </div>
     </div>
   );

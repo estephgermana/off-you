@@ -5,10 +5,12 @@ import '../styles/Cadastro.css';
 
 const Cadastro: React.FC = () => {
   const [nome, setNome] = useState('');
+  const [dataNascimento, setDataNascimento] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
   const [error, setError] = useState('');
+  const [tipoUsuario, setTipoUsuario] = useState('familiar');
 
   const handleCadastro = () => {
     if (!nome || !email || !senha || !confirmarSenha) {
@@ -37,6 +39,19 @@ const Cadastro: React.FC = () => {
             placeholder="Digite seu nome"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
+          />
+          <label>Que tipo de usuário você é?</label>
+          <select value={tipoUsuario} onChange={(e) => setTipoUsuario(e.target.value)}>
+            <option value="familiar">Familiar</option>
+            <option value="amigo">Amigo</option>
+          </select>
+
+           <label htmlFor="dataNascimento">Data de Nascimento da Vitima</label>
+          <input
+            type="date"
+            id="dataNascimento"
+            value={dataNascimento}
+            onChange={(e) => setDataNascimento(e.target.value)}
           />
 
           <label htmlFor="email">Email</label>
