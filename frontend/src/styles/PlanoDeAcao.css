@@ -102,4 +102,14 @@
   button:hover {
     background-color: #7a6283;
   }
-  
+  .avaliacao-botoes button {
+  background: none;
+  border: none;
+  font-size: 2rem; 
+  color: #ccc; 
+  cursor: pointer;
+}
+
+.avaliacao-botoes button.selecionado {
+  color: gold; 
+}
