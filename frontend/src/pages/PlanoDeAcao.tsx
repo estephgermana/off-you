@@ -7,72 +7,43 @@ type Grau = "Uso saudável" | "Dependência leve" | "Dependência moderada" | "D
 
 const planos: Record<Grau, { descricao: string; atividades: string[] }> = {
   "Uso saudável": {
-    descricao: "Acompanhamento leve, com incentivo a boas práticas e manutenção do equilíbrio no uso da internet.",
+    descricao: "Acompanhamento leve e incentivo a boas práticas.",
     atividades: [
-      "Estabelecer combinados afetivos, como: 'Durante o jantar, vamos guardar os celulares?' ou 'Na hora de dormir, não ter eletrônicos no quarto.'",
-      "Estimular a prática de atividades físicas - Propor exercícios leves como caminhadas, alongamentos ou esportes em grupo, para liberar endorfina e promover bem-estar físico e mental.",
       "Convidar para passeios, refeições ou momentos em grupo longe do celular.",
-      "Estimular o uso equilibrado de telas por meio de elogios e reconhecimento positivo.",
-      "Propor atividades divertidas offline, como jogos, caminhadas, cozinhar em grupo ou projetos manuais.",
-      "Incentivar hábitos de autocuidado, como ouvir músicas relaxantes, desenhar ou escrever um diário à mão.",
-      "Promover a descoberta de novos hobbies - Explorar interesses como fotografia, jardinagem, culinária ou tocar um instrumento musical.",
-      "Promover um 'desafio semanal offline' com pequenas recompensas simbólicas.",
-      "Estimular a participação em clubes de leitura, música ou cinema com encontros presenciais.",
-      "Estimular a criação de metas semanais sobre o uso consciente da internet.",
-      "Criar uma agenda física para marcar emoções e registrar o dia sem telas.",
-      "Envolver gradativamente em pequenas tarefas domésticas, como tirar o lixo, guardar a louça ou organizar o quarto."
-    ]
+      "Incentivar o uso equilibrado de telas com elogios e reconhecimento.",
+      "Propor atividades divertidas offline, como jogos, caminhadas, ou cozinhar juntos.",
+      "Estimular pequenos desafios como: 'Vamos deixar o celular de lado por um tempo e fazer algo diferente juntos?'",
+    ],
   },
   "Dependência leve": {
-    descricao: "Sinais iniciais de dependência percebidos. Intervenções afetuosas podem ajudar a reequilibrar o uso da internet.",
+    descricao: "Sinais iniciais de dependência percebidos.",
     atividades: [
-      "Criar momentos de convivência leves, como refeições ou sessões de filmes sem celulares.",
-      "Estabelecer combinados afetivos, como: 'Durante o jantar, vamos guardar os celulares?' ou 'Na hora de dormir, não ter eletrônicos no quarto.'",
-      "Estimular a prática de atividades físicas - Propor exercícios leves como caminhadas, alongamentos ou esportes em grupo, para liberar endorfina e promover bem-estar físico e mental.",
-      "Convidar para hobbies offline, como montar quebra-cabeça, pintar, andar de bicicleta ou fazer artesanato.",
-      "Conversar com empatia: 'Notei que você tem passado bastante tempo online, quer fazer outra coisa comigo por um tempo?'",
-      "Criar um 'mapa do tempo' para identificar o tempo gasto nas telas e propor pequenas trocas.",
-      "Usar aplicativos de controle de tempo como ferramenta de desafio divertido e colaborativo.",
-      "Propor que monte uma playlist de músicas para momentos offline.",
-      "Estimular a criação de metas semanais sobre o uso consciente da internet.",
-      "Promover a descoberta de novos hobbies - Explorar interesses como fotografia, jardinagem, culinária ou tocar um instrumento musical.",
-      "Criar uma agenda física para marcar emoções e registrar o dia sem telas.",
-      "Envolver gradativamente em pequenas tarefas domésticas, como tirar o lixo, guardar a louça ou organizar o quarto."
-    ]
+      "Criar momentos de convivência leves, como refeições ou filmes sem celulares por perto.",
+      "Estabelecer combinados afetivos como: 'Durante o jantar, vamos deixar os celulares guardados?'",
+      "Convidar para hobbies offline, como montar quebra-cabeça, pintar ou andar de bicicleta juntos.",
+      "Conversar com empatia, dizendo: 'Notei que você tem passado bastante tempo online, quer fazer outra coisa comigo por um tempo?'",
+    ],
   },
   "Dependência moderada": {
-    descricao: "O uso excessivo já afeta a rotina, trazendo prejuízos visíveis. A abordagem precisa ser mais cuidadosa, com escuta ativa e incentivo ao resgate de interesses.",
+    descricao: "Prejuízos percebidos e rotina afetada.",
     atividades: [
-      "Estabelecer combinados afetivos, como: 'Durante o jantar, vamos guardar os celulares?' ou 'Na hora de dormir, não ter eletrônicos no quarto.'",
-      "Estar presente, sem cobranças, mostrando-se disponível para conversar ou simplesmente estar junto.",
-      "Propor atividades fora de casa, mesmo que rápidas, como uma caminhada até a padaria.",
-      "Retomar algo que a pessoa costumava gostar antes, como ver fotos antigas, cuidar de plantas ou passear com um pet.",
-      "Ajudar a refletir sobre como o uso da internet tem impactado sua rotina, sem julgamento.",
-      "Sugerir apoio profissional com carinho, mostrando que está disposto a acompanhar nos primeiros passos.",
-      "Estimular a prática de atividades físicas - Propor exercícios leves como caminhadas, alongamentos ou esportes em grupo, para liberar endorfina e promover bem-estar físico e mental.",
-      "Criar uma agenda física para marcar emoções e registrar o dia sem telas.",
-      "Promover a descoberta de novos hobbies - Explorar interesses como fotografia, jardinagem, culinária ou tocar um instrumento musical.",
-      "Estimular a criação de metas semanais sobre o uso consciente da internet.",
-      "Envolver gradativamente em pequenas tarefas domésticas, como tirar o lixo, guardar a louça ou organizar o quarto."
-    ]
+      "Estar presente, sem cobranças, mostrando-se disponível para conversar ou apenas estar junto.",
+      "Propor atividades fora de casa, mesmo rápidas, como uma caminhada ou uma ida até uma padaria.",
+      "Retomar algo que a pessoa costumava gostar antes, como ver um álbum de fotos, cuidar de plantas ou ouvir música juntos.",
+      "Ajudar a perceber como o uso da internet está impactando a rotina e oferecer acolhimento para buscar ajuda.",
+      "Sugerir apoio profissional com carinho, mostrando que está disposto a acompanhar.",
+    ],
   },
   "Dependência severa": {
-    descricao: "Há isolamento significativo e prejuízos graves no cotidiano. É necessário acolhimento contínuo, fortalecimento do vínculo e ajuda profissional.",
+    descricao: "Isolamento e prejuízos graves observados.",
     atividades: [
-      "Estabelecer combinados afetivos, como: 'Durante o jantar, vamos guardar os celulares?' ou 'Na hora de dormir, não ter eletrônicos no quarto.'",
-      "Demonstrar acolhimento com presença, mesmo que ela esteja isolada ou usando o celular.",
-      "Evitar confrontos diretos; priorizar a escuta ativa e a construção de confiança.",
-      "Propor pequenas ações cotidianas, como arrumar o quarto, tomar um café juntos ou praticar um exercício físico.",
-      "Relembrar afetivamente momentos bons vividos fora do ambiente digital.",
+      "Demonstrar acolhimento com presença, mesmo que a pessoa esteja isolada ou usando o celular.",
+      "Evitar confrontos diretos; priorizar a escuta e a construção de confiança.",
+      "Sugerir pequenas ações juntos, como abrir a janela, tomar um café, ou ouvir uma música.",
+      "Relembrar afetivamente momentos bons que viveram juntos fora do ambiente digital.",
       "Acompanhar com paciência e constância, sendo um apoio silencioso e amoroso.",
-      "Introduzir práticas sensoriais como pintura com os dedos, desenhar ou cozinhar.",
-      "Incluir em rodas de acolhimento para orientar e fortalecer a rede de apoio.",
-      "Promover a descoberta de novos hobbies - Explorar interesses como fotografia, jardinagem, culinária ou tocar um instrumento musical.",
-      "Estimular a criação de metas semanais sobre o uso consciente da internet.",
-      "Criar uma agenda física para marcar emoções e registrar o dia sem telas.",
-      "Envolver gradativamente em pequenas tarefas domésticas, como tirar o lixo, guardar a louça ou organizar o quarto."
-    ]
-  }
+    ],
+  },
 };
 
 export default function PlanoDeAcao() {
@@ -158,22 +129,15 @@ export default function PlanoDeAcao() {
      
       {atividadesFeitas[indexAtual] && (
         <>
-        <div className="avaliacao-box" style={{ marginBottom: "16px" }}>
-  <label>Avalie a atividade:</label>
-  <div className="avaliacao-botoes">
-    {[1, 2, 3, 4, 5].map((nota) => (
-      <button
-        key={nota}
-        className={avaliacoes[indexAtual] >= nota ? "selecionado" : ""}
-        onClick={() => atualizarAvaliacao(nota)}
-        aria-label={Avaliar com ${nota} estrela${nota > 1 ? 's' : ''}}
-      >
-        ★
-      </button>
-    ))}
-  </div>
-</div>
-
+          <div className="avaliacao-box" style={{ marginBottom: "16px" }}>
+            <label>Avalie a atividade:</label>
+            <div className="avaliacao-botoes">
+              {[1, 2, 3, 4, 5].map((nota) => (
+                <button key={nota} className={avaliacoes[indexAtual] === nota ? "selecionado" : ""} onClick={() => atualizarAvaliacao(nota)}>{nota}</button>
+              ))
+            }
+            </div>
+          </div>
 
           <div className="comentario-box">
             <label>Fale mais sobre a experiência da Vitima:</label>
