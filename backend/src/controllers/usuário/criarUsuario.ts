@@ -10,14 +10,14 @@ const schemaCadastro = yup.object({
     email: yup.string().email('Formato de email inválido.').required('Email é obrigatório.'),
     senha: yup.string().min(6, 'A senha deve ter no mínimo 6 caracteres.').required('Senha é obrigatória.'),
     tipo_usuario: yup.string().default('familiar'),
-    data_nascimento: yup.date().required('Data de nascimento é obrigatória.'),
+    data_nascimento_vitima: yup.date().required('Data de nascimento é obrigatória.'),
   });
 
 export const criarUsuario = async (req: Request, res: Response) => {
     try {
         await schemaCadastro.validate(req.body, { abortEarly: false });
     
-        const { nome, email, senha, data_nascimento, nivel_proximidade } = req.body;
+        const { nome, email, senha, data_nascimento_vitima, nivel_proximidade } = req.body;
     
         const usuarioExistente = await knex('usuario').where({ email }).first();
         if (usuarioExistente) {
@@ -38,7 +38,7 @@ export const criarUsuario = async (req: Request, res: Response) => {
             senha: senhaHash,
             tipo_usuario: tipo_usuario,
             data_cadastro: new Date(),
-            data_nascimento,
+            data_nascimento_vitima,
             nivel_proximidade
           });
         });

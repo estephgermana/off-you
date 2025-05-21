@@ -9,24 +9,49 @@ const Cadastro: React.FC = () => {
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
   const [error, setError] = useState('');
-  const [tipoUsuario, setTipoUsuario] = useState('familiar');
+  const [nivel_proximidade, setNivelProximidade] = useState('medio');
 
   // Criando o navigate
   const navigate = useNavigate();
 
-  const handleCadastro = () => {
-    if (!nome || !email || !senha || !confirmarSenha) {
-      setError('Por favor, preencha todos os campos.');
+ const handleCadastro = async () => {
+  if (!nome || !email || !senha || !confirmarSenha || !dataNascimento) {
+    setError('Por favor, preencha todos os campos.');
+    return;
+  }
+
+  if (senha !== confirmarSenha) {
+    setError('As senhas não coincidem.');
+    return;
+  }
+
+  try {
+    const response = await fetch('http://localhost:3003/v1/cadastro', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nome,
+        email,
+        senha,
+        data_nascimento_vitima: dataNascimento,
+        nivel_proximidade:  nivel_proximidade
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setError(data.message || 'Erro ao cadastrar.');
       return;
     }
-    if (senha !== confirmarSenha) {
-      setError('As senhas não coincidem.');
-      return;
-    }
-    setError('');
-    console.log('Cadastro realizado:', { nome, email });
-    navigate('/'); // Redirecionando para a Home
-  };
+
+    console.log('Cadastro realizado com sucesso:', data);
+    navigate('/login');
+  } catch (error) {
+    console.error('Erro na requisição:', error);
+    setError('Erro inesperado ao se cadastrar.');
+  }
+};
 
   return (
     <div className="border-container-cadastro">
@@ -43,10 +68,11 @@ const Cadastro: React.FC = () => {
             value={nome}
             onChange={(e) => setNome(e.target.value)}
           />
-          <label>Que tipo de usuário você é?</label>
-          <select value={tipoUsuario} onChange={(e) => setTipoUsuario(e.target.value)}>
-            <option value="familiar">Familiar</option>
-            <option value="amigo">Amigo</option>
+          <label>Qual nível de proximidade com a Vítima</label>
+          <select value={nivel_proximidade} onChange={(e) => setNivelProximidade(e.target.value)}>
+            <option value="alto">Alto</option>
+            <option value="medio">Médio</option>
+            <option value="baixo">Baixo</option>
           </select>
 
           <label htmlFor="dataNascimento">Data de Nascimento da Vítima</label>
