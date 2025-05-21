@@ -31,8 +31,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, options))
 
 app.use("/v1", router);
 
-app.listen(3000, () => {
-    console.log("Server is running  in http://localhost:3000")
+app.listen(3003, () => {
+    console.log("Server is running  in http://localhost:3003")
 })
 
 export default app;

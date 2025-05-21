@@ -1,8 +1,7 @@
 // src/pages/Questionario.tsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-
-
+import axios from 'axios';
 import '../styles/Questionario.css';
 
 const perguntas = [
@@ -70,7 +69,6 @@ const Questionario: React.FC = () => {
   const [indicePergunta, setIndicePergunta] = useState(0);
   const [respostas, setRespostas] = useState<number[]>(new Array(perguntas.length).fill(-1));
   const [resultado, setResultado] = useState<null | typeof resultados[0]>(null);
-  
 
   const handleResposta = (index: number) => {
     const novasRespostas = [...respostas];
@@ -94,14 +92,41 @@ const Questionario: React.FC = () => {
     }
   };
 
-  const calcularResultado = () => {
+  const calcularResultado = async () => {
     const total = respostas.reduce((acc, val) => acc + (val + 1), 0);
-    let grau;
-    if (total <= 30) grau = resultados[0];
-    else if (total <= 45) grau = resultados[1];
-    else if (total <= 60) grau = resultados[2];
-    else grau = resultados[3];
-    setResultado(grau);
+    let grauSelecionado;
+
+    if (total <= 30) grauSelecionado = resultados[0];
+    else if (total <= 45) grauSelecionado = resultados[1];
+    else if (total <= 60) grauSelecionado = resultados[2];
+    else grauSelecionado = resultados[3];
+
+    setResultado(grauSelecionado);
+
+    // Envio para o backend
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.warn("Usuário não autenticado.");
+        return;
+      }
+
+      await axios.post(
+        'http://localhost:3003/v1/resultado-questionario', 
+        {
+          grau: grauSelecionado.grau,
+          descricao: grauSelecionado.descricao,
+          pontuacao: total
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+    } catch (error) {
+      console.error('Erro ao salvar resultado:', error);
+    }
   };
 
   return (
@@ -120,8 +145,6 @@ const Questionario: React.FC = () => {
           <Link to="/cadastro">
             <button>Cadastre-se para ver o Plano de Ação</button>
           </Link>
-
-
         </div>
       ) : (
         <div>
