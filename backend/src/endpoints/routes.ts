@@ -9,6 +9,7 @@ import { editarDadosUsuario } from '../controllers/usuário/editarDadosUsuario';
 import { deletarUsuario } from '../controllers/usuário/deletarUsuario';
 import { redefinirSenha } from "../controllers/usuário/redefinirSenha";
 import { resultadoQuestionario } from '../controllers/usuário/resultadoQuestionario';
+import { verificarResultadoQuestionario } from '../controllers/usuário/verificaResultadoQuestionario';
 
 const router = Router();
 
@@ -22,5 +23,7 @@ router.delete('/perfil/excluir-cadastro', verificarToken, deletarUsuario);
 router.post('/recuperar-senha', recuperarSenhaUsuario);
 router.post('/redefinir-senha', redefinirSenha);
 router.post('/resultado-questionario', verificarToken, resultadoQuestionario);
+router.get('/validar_resposta_questionario', verificarResultadoQuestionario);
+
 
 export { router };

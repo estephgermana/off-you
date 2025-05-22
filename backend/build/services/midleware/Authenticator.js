@@ -40,29 +40,53 @@ const jwt = __importStar(require("jsonwebtoken"));
 const bcrypt = __importStar(require("bcryptjs"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const SECRET_KEY = "meuSegredo";
+const SECRET_KEY = process.env.JWT_SECRET_KEY;
+if (!SECRET_KEY) {
+    throw new Error("A variável de ambiente JWT_SECRET_KEY não está definida!");
+}
 class Authenticator {
-    generateToken(info) {
-        const token = jwt.sign({ id_usuario: info.id_usuario, tipo: info.tipo }, SECRET_KEY, { expiresIn: "12h" });
-        return token;
+    generateToken(info, expiresIn = "12h") {
+        try {
+            const token = jwt.sign({ id_usuario: info.id_usuario, tipo: info.tipo }, SECRET_KEY, { expiresIn });
+            return token;
+        }
+        catch (error) {
+            console.error("Erro ao gerar token:", error);
+            throw new Error("Não foi possível gerar o token.");
+        }
     }
     getTokenData(token) {
-        const payload = jwt.verify(token, SECRET_KEY);
-        return payload;
+        try {
+            const payload = jwt.verify(token, SECRET_KEY);
+            return payload;
+        }
+        catch (error) {
+            console.error("Erro ao verificar token:", error);
+            throw new Error("Token inválido ou expirado.");
+        }
     }
 }
 exports.Authenticator = Authenticator;
 class HashManager {
     hash(text) {
         return __awaiter(this, void 0, void 0, function* () {
-            const rounds = Number(process.env.BCRYPT_COST);
+            const rounds = Number(process.env.BCRYPT_COST) || 10;
+            if (isNaN(rounds) || rounds < 4 || rounds > 14) {
+                throw new Error("BCRYPT_COST deve ser um número entre 4 e 14.");
+            }
             const salt = yield bcrypt.genSalt(rounds);
             return bcrypt.hash(text, salt);
         });
     }
     compare(text, hash) {
         return __awaiter(this, void 0, void 0, function* () {
-            return bcrypt.compare(text, hash);
+            try {
+                return bcrypt.compare(text, hash);
+            }
+            catch (error) {
+                console.error("Erro ao comparar senhas:", error);
+                throw new Error("Erro ao verificar a senha.");
+            }
         });
     }
 }

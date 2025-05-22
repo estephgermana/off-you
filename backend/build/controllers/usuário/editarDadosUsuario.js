@@ -35,41 +35,54 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loginUsuario = void 0;
+exports.editarDadosUsuario = exports.schemaEditarPerfil = void 0;
 const connection_1 = __importDefault(require("../../connection"));
-const Authenticator_1 = require("../../services/midleware/Authenticator");
 const yup = __importStar(require("yup"));
-const schemaLogin = yup.object({
-    email: yup.string().email('Formato de email inválido.').required('Email é obrigatório.'),
-    senha: yup.string().required('Senha é obrigatória.'),
+exports.schemaEditarPerfil = yup.object({
+    nome: yup.string().min(3, 'Nome muito curto.').optional(),
+    email: yup.string().email('Email inválido.').optional(),
+    data_nascimento: yup.date().optional()
 });
-const loginUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const editarDadosUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield schemaLogin.validate(req.body, { abortEarly: false });
-        const { email, senha } = req.body;
-        const usuario = yield (0, connection_1.default)('usuario').where({ email }).first();
-        if (!usuario) {
-            return res.status(400).json({ message: 'Usuário ou senha inválidos.' });
+        const { id_usuario } = req.body.tokenData;
+        yield exports.schemaEditarPerfil.validate(req.body, { abortEarly: false });
+        const { nome, email, data_nascimento } = req.body;
+        const usuarioAtual = yield (0, connection_1.default)('usuario').where({ id_usuario }).first();
+        if (!usuarioAtual) {
+            return res.status(404).json({ message: 'Usuário não encontrado.' });
         }
-        const hashManager = new Authenticator_1.HashManager();
-        const senhaValida = yield hashManager.compare(senha, usuario.senha);
-        if (!senhaValida) {
-            return res.status(400).json({ message: 'Usuário ou senha inválidos.' });
+        if (email && email !== usuarioAtual.email) {
+            const emailExistente = yield (0, connection_1.default)('usuario')
+                .where({ email })
+                .andWhereNot({ id_usuario })
+                .first();
+            if (emailExistente) {
+                return res.status(400).json({ message: 'Esse e-mail já está em uso por outro usuário.' });
+            }
         }
-        const auth = new Authenticator_1.Authenticator();
-        const token = auth.generateToken({
-            id_usuario: usuario.id_usuario,
-            tipo: usuario.tipo_usuario,
+        yield (0, connection_1.default)('usuario')
+            .where({ id_usuario })
+            .update({
+            nome: nome || usuarioAtual.nome,
+            email: email || usuarioAtual.email,
+            data_nascimento: data_nascimento || usuarioAtual.data_nascimento
         });
-        res.status(200).json({ message: 'Login realizado com sucesso.', token });
+        const usuarioAtualizado = yield (0, connection_1.default)('usuario')
+            .select('nome', 'email', 'tipo_usuario', 'data_nascimento', 'data_cadastro')
+            .where({ id_usuario })
+            .first();
+        res.status(200).json({
+            message: 'Cadastro atualizado com sucesso.',
+            usuario: usuarioAtualizado
+        });
     }
     catch (error) {
-        console.error(error);
-        if (error instanceof yup.ValidationError) {
+        if (error.name === 'ValidationError') {
             return res.status(400).json({ message: 'Erro de validação', errors: error.errors });
         }
-        res.status(500).json({ message: 'Erro inesperado ao realizar login.' });
+        res.status(500).json({ message: 'Erro ao atualizar cadastro.' });
     }
 });
-exports.loginUsuario = loginUsuario;
-//# sourceMappingURL=loginUsuario.js.map
+exports.editarDadosUsuario = editarDadosUsuario;
+//# sourceMappingURL=editarDadosUsuario.js.map

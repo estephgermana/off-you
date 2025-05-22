@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-
+import { useAuth } from '../context/AuthContext'; 
 import '../styles/Login.css';
 
 const Login: React.FC = () => {
@@ -17,9 +17,11 @@ const Login: React.FC = () => {
     }
   }, []);
 
+  const { login } = useAuth();
+
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://localhost:3003/v1/login', {
+      const response = await fetch('https://off-you.onrender.com/v1/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, senha })
@@ -33,7 +35,7 @@ const Login: React.FC = () => {
       }
 
       localStorage.setItem('token', data.token);
-
+      login(data.token);
       console.log('Login bem-sucedido!');
       navigate('/');
     } catch (error) {
