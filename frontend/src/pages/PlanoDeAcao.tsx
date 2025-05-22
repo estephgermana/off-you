@@ -1,100 +1,213 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import '../styles/PlanoDeAcao.css';
 
 type Grau = "Uso saudável" | "Dependência leve" | "Dependência moderada" | "Dependência severa";
+type FaixaEtaria = "0-4 anos" | "5-10 anos";
 
-const planos: Record<Grau, { descricao: string; atividades: string[] }> = {
-  "Uso saudável": {
-    descricao: "Acompanhamento leve e incentivo a boas práticas.",
-    atividades: [
-      "Convidar para passeios, refeições ou momentos em grupo longe do celular.",
-      "Incentivar o uso equilibrado de telas com elogios e reconhecimento.",
-      "Propor atividades divertidas offline, como jogos, caminhadas, ou cozinhar juntos.",
-      "Estimular pequenos desafios como: 'Vamos deixar o celular de lado por um tempo e fazer algo diferente juntos?'",
-    ],
+const planosDeAcaoDetalhado: Record<FaixaEtaria, Record<Grau, { titulo: string; sugestoes: string[] }>> = {
+  '0-4 anos': {
+    'Uso saudável': {
+      titulo: 'Plano de Ação: Uso Saudável (0-4 anos)',
+      sugestoes: [
+        'Mantenha o ambiente familiar rico em estímulos offline (brinquedos, livros, atividades ao ar livre).',
+        'Limite o tempo de tela para no máximo 1 hora por dia, sempre com supervisão.',
+        'Priorize brincadeiras interativas e tempo de qualidade em família.'
+      ]
+    },
+    'Dependência leve': {
+      titulo: 'Plano de Ação: Dependência Leve (0-4 anos)',
+      sugestoes: [
+        'Crie rotinas bem definidas para o uso de telas, com horários fixos e curtos.',
+        'Ofereça alternativas divertidas e envolventes longe das telas, como pintura, massinha, blocos de montar.',
+        'Aumente o tempo de interação um-a-um com a criança, com brincadeiras que estimulem a criatividade e a coordenação motora.'
+      ]
+    },
+    'Dependência moderada': {
+      titulo: 'Plano de Ação: Dependência Moderada (0-4 anos)',
+      sugestoes: [
+        'Reduza drasticamente o tempo de tela, preferencialmente eliminando-o temporariamente para reeducação.',
+        'Busque atividades sensoriais e motoras que capturem a atenção da criança (parques, natação, caça ao tesouro).',
+        'Considere a busca por apoio profissional (pediatra, psicólogo infantil) para orientação e manejo do comportamento.'
+      ]
+    },
+    'Dependência severa': {
+      titulo: 'Plano de Ação: Dependência Severa (0-4 anos)',
+      sugestoes: [
+        'Intervenção imediata: corte total do acesso às telas e remoção de dispositivos eletrônicos do ambiente da criança.',
+        'Busque apoio psicológico e pedagógico especializado para a criança e a família.',
+        'Crie um ambiente rico em estímulos não digitais e promova o máximo de interação social e física.'
+      ]
+    }
   },
-  "Dependência leve": {
-    descricao: "Sinais iniciais de dependência percebidos.",
-    atividades: [
-      "Criar momentos de convivência leves, como refeições ou filmes sem celulares por perto.",
-      "Estabelecer combinados afetivos como: 'Durante o jantar, vamos deixar os celulares guardados?'",
-      "Convidar para hobbies offline, como montar quebra-cabeça, pintar ou andar de bicicleta juntos.",
-      "Conversar com empatia, dizendo: 'Notei que você tem passado bastante tempo online, quer fazer outra coisa comigo por um tempo?'",
-    ],
-  },
-  "Dependência moderada": {
-    descricao: "Prejuízos percebidos e rotina afetada.",
-    atividades: [
-      "Estar presente, sem cobranças, mostrando-se disponível para conversar ou apenas estar junto.",
-      "Propor atividades fora de casa, mesmo rápidas, como uma caminhada ou uma ida até uma padaria.",
-      "Retomar algo que a pessoa costumava gostar antes, como ver um álbum de fotos, cuidar de plantas ou ouvir música juntos.",
-      "Ajudar a perceber como o uso da internet está impactando a rotina e oferecer acolhimento para buscar ajuda.",
-      "Sugerir apoio profissional com carinho, mostrando que está disposto a acompanhar.",
-    ],
-  },
-  "Dependência severa": {
-    descricao: "Isolamento e prejuízos graves observados.",
-    atividades: [
-      "Demonstrar acolhimento com presença, mesmo que a pessoa esteja isolada ou usando o celular.",
-      "Evitar confrontos diretos; priorizar a escuta e a construção de confiança.",
-      "Sugerir pequenas ações juntos, como abrir a janela, tomar um café, ou ouvir uma música.",
-      "Relembrar afetivamente momentos bons que viveram juntos fora do ambiente digital.",
-      "Acompanhar com paciência e constância, sendo um apoio silencioso e amoroso.",
-    ],
-  },
+  '5-10 anos': {
+    'Uso saudável': {
+      titulo: 'Plano de Ação: Uso Saudável (5-10 anos)',
+      sugestoes: [
+        'Incentive o uso consciente da internet para aprendizado e lazer, com supervisão parental.',
+        'Estimule hobbies e atividades extracurriculares (esportes, música, artes).',
+        'Mantenha o diálogo aberto sobre os perigos e benefícios da internet, ensinando sobre segurança online.'
+      ]
+    },
+    'Dependência leve': {
+      titulo: 'Plano de Ação: Dependência Leve (5-10 anos)',
+      sugestoes: [
+        'Defina regras claras de tempo de tela e conteúdo, com acordos e consequências.',
+        'Incentive a participação em atividades em grupo e brincadeiras ao ar livre com amigos.',
+        'Explore novos interesses e talentos da criança que não envolvam telas, como leitura, jogos de tabuleiro ou culinária.'
+      ]
+    },
+    'Dependência moderada': {
+      titulo: 'Plano de Ação: Dependência Moderada (5-10 anos)',
+      sugestoes: [
+        'Estabeleça um cronograma rigoroso de uso da internet, com períodos de "desintoxicação digital".',
+        'Aumente o envolvimento em atividades familiares e sociais, buscando reconectar a criança com o mundo real.',
+        'Considere a busca por aconselhamento psicológico para a criança e orientação para os pais.'
+      ]
+    },
+    'Dependência severa': {
+      titulo: 'Plano de Ação: Dependência Severa (5-10 anos)',
+      sugestoes: [
+        'Intervenção profissional é crucial: procure um psicólogo infantil ou psiquiatra especializado em dependência digital.',
+        'Restrição total ou quase total do acesso à internet, com acompanhamento e supervisão constante.',
+        'Implemente um plano de reabilitação que inclua terapias, atividades sociais e educacionais, e apoio familiar intensivo.'
+      ]
+    }
+  }
 };
+
 
 export default function PlanoDeAcao() {
   const location = useLocation();
-  const grauDependencia: Grau = location.state?.grau || "Uso saudável";
-  const planoAtual = planos[grauDependencia];
+  const navigate = useNavigate();
+  const { faixaEtaria: faixaEtariaParam } = useParams<{ faixaEtaria: string }>();
+
+  const grauDependencia = (location.state?.grau as Grau) || "Uso saudável";
+  const faixaEtaria = (faixaEtariaParam as FaixaEtaria) || "0-4 anos";
+
+  const planoAtual = planosDeAcaoDetalhado[faixaEtaria]?.[grauDependencia];
+
+  useEffect(() => {
+    if (!planoAtual || !Object.keys(planosDeAcaoDetalhado).includes(faixaEtaria)) {
+      console.warn("Plano de ação não encontrado para a combinação de faixa etária e grau. Redirecionando.");
+      navigate('/questionario');
+    }
+  }, [planoAtual, navigate, faixaEtaria]);
 
   const [indexAtual, setIndexAtual] = useState(0);
   const [atividadesFeitas, setAtividadesFeitas] = useState<boolean[]>([]);
   const [comentarios, setComentarios] = useState<string[]>([]);
   const [avaliacoes, setAvaliacoes] = useState<number[]>([]);
+  const [atividadeAtualSalva, setAtividadeAtualSalva] = useState<boolean>(false); 
+
+
+  const getStorageKey = (fe: FaixaEtaria, gd: Grau) => {
+    const cleanFaixaEtaria = fe.replace(/[^a-zA-Z0-9]/g, '');
+    const cleanGrauDependencia = gd.replace(/[^a-zA-Z0-9]/g, '');
+    return `registros_${cleanFaixaEtaria}_${cleanGrauDependencia}`;
+  };
 
   useEffect(() => {
-    const registros = JSON.parse(localStorage.getItem("registros") || "[]");
-    const progressoAtual = registros.find((r: any) => r.grau === grauDependencia);
-    if (progressoAtual) {
-      setAtividadesFeitas(progressoAtual.atividades.map((a: any) => a.feita));
-      setComentarios(progressoAtual.atividades.map((a: any) => a.comentario));
-      setAvaliacoes(progressoAtual.atividades.map((a: any) => a.avaliacao || 0));
-    } else {
-      setAtividadesFeitas(new Array(planoAtual.atividades.length).fill(false));
-      setComentarios(new Array(planoAtual.atividades.length).fill(""));
-      setAvaliacoes(new Array(planoAtual.atividades.length).fill(0));
+    if (planoAtual) {
+      const storageKey = getStorageKey(faixaEtaria, grauDependencia);
+      const registroSalvo = localStorage.getItem(storageKey);
+
+      if (registroSalvo) {
+        try {
+          const progressoAtual = JSON.parse(registroSalvo);
+          if (progressoAtual && progressoAtual.atividades) {
+            if (progressoAtual.grau === grauDependencia && progressoAtual.faixaEtaria === faixaEtaria) {
+                setAtividadesFeitas(progressoAtual.atividades.map((a: any) => a.feita));
+                setComentarios(progressoAtual.atividades.map((a: any) => a.comentario || ""));
+                setAvaliacoes(progressoAtual.atividades.map((a: any) => a.avaliacao || 0));
+
+
+                const isCurrentActivitySaved = progressoAtual.atividades[indexAtual]?.feita && 
+                                               (progressoAtual.atividades[indexAtual]?.avaliacao > 0 || 
+                                                progressoAtual.atividades[indexAtual]?.comentario?.trim() !== "");
+                setAtividadeAtualSalva(isCurrentActivitySaved);
+
+            } else {
+                setAtividadesFeitas(new Array(planoAtual.sugestoes.length).fill(false));
+                setComentarios(new Array(planoAtual.sugestoes.length).fill(""));
+                setAvaliacoes(new Array(planoAtual.sugestoes.length).fill(0));
+                setAtividadeAtualSalva(false);
+            }
+          } else {
+            setAtividadesFeitas(new Array(planoAtual.sugestoes.length).fill(false));
+            setComentarios(new Array(planoAtual.sugestoes.length).fill(""));
+            setAvaliacoes(new Array(planoAtual.sugestoes.length).fill(0));
+            setAtividadeAtualSalva(false);
+          }
+        } catch (e) {
+          console.error("Erro ao parsear registro do localStorage:", e);
+          setAtividadesFeitas(new Array(planoAtual.sugestoes.length).fill(false));
+          setComentarios(new Array(planoAtual.sugestoes.length).fill(""));
+          setAvaliacoes(new Array(planoAtual.sugestoes.length).fill(0));
+          setAtividadeAtualSalva(false);
+        }
+      } else {
+        setAtividadesFeitas(new Array(planoAtual.sugestoes.length).fill(false));
+        setComentarios(new Array(planoAtual.sugestoes.length).fill(""));
+        setAvaliacoes(new Array(planoAtual.sugestoes.length).fill(0));
+        setAtividadeAtualSalva(false);
+      }
     }
-  }, [planoAtual]);
+  }, [planoAtual, faixaEtaria, grauDependencia, indexAtual]);
 
   const toggleAtividade = () => {
-    const novas = [...atividadesFeitas];
-    novas[indexAtual] = !novas[indexAtual];
-    setAtividadesFeitas(novas);
-    salvarProgresso();
+
+    if (!atividadeAtualSalva) {
+      const novas = [...atividadesFeitas];
+      novas[indexAtual] = !novas[indexAtual];
+      setAtividadesFeitas(novas);
+
+      if (!novas[indexAtual]) {
+          const novasAvaliacoes = [...avaliacoes];
+          novasAvaliacoes[indexAtual] = 0;
+          setAvaliacoes(novasAvaliacoes);
+
+          const novosComentarios = [...comentarios];
+          novosComentarios[indexAtual] = "";
+          setComentarios(novosComentarios);
+      }
+    }
   };
 
   const atualizarComentario = (texto: string) => {
-    const novos = [...comentarios];
-    novos[indexAtual] = texto;
-    setComentarios(novos);
-    salvarProgresso();
+
+    if (!atividadeAtualSalva) {
+      const novos = [...comentarios];
+      novos[indexAtual] = texto;
+      setComentarios(novos);
+    }
   };
 
   const atualizarAvaliacao = (nota: number) => {
-    const novas = [...avaliacoes];
-    novas[indexAtual] = nota;
-    setAvaliacoes(novas);
-    salvarProgresso();
+
+    if (!atividadeAtualSalva) {
+      const novas = [...avaliacoes];
+      novas[indexAtual] = nota;
+      setAvaliacoes(novas);
+    }
   };
 
   const salvarProgresso = () => {
-    const registro = {
+    if (!planoAtual) {
+      console.warn("Plano de ação não disponível, não é possível salvar.");
+      return;
+    }
+
+    if (!atividadesFeitas[indexAtual] || (avaliacoes[indexAtual] === 0 && comentarios[indexAtual].trim() === "")) {
+        alert("Para salvar o progresso, a atividade precisa estar marcada como concluída E ter uma avaliação ou comentário.");
+        return;
+    }
+
+    const registroParaSalvar = {
       grau: grauDependencia,
-      atividades: planoAtual.atividades.map((a, i) => ({
+      faixaEtaria: faixaEtaria,
+      atividades: planoAtual.sugestoes.map((a, i) => ({
         texto: a,
         feita: atividadesFeitas[i],
         comentario: comentarios[i],
@@ -102,56 +215,118 @@ export default function PlanoDeAcao() {
       })),
       data: new Date().toLocaleString(),
     };
-    const registros = JSON.parse(localStorage.getItem("registros") || "[]");
-    const index = registros.findIndex((r: any) => r.grau === grauDependencia);
-    if (index !== -1) registros[index] = registro;
-    else registros.push(registro);
-    localStorage.setItem("registros", JSON.stringify(registros));
+
+    const storageKey = getStorageKey(faixaEtaria, grauDependencia);
+    localStorage.setItem(storageKey, JSON.stringify(registroParaSalvar));
+    console.log(`Progresso salvo para ${faixaEtaria} - ${grauDependencia} na chave: ${storageKey}`);
+    alert("Progresso salvo com sucesso!");
+    setAtividadeAtualSalva(true); 
   };
+
+  const irParaProximaAtividade = () => {
+    setIndexAtual(prev => prev + 1);
+    const storageKey = getStorageKey(faixaEtaria, grauDependencia);
+    const registroSalvo = localStorage.getItem(storageKey);
+    if (registroSalvo) {
+      const progressoAtual = JSON.parse(registroSalvo);
+      if (progressoAtual && progressoAtual.atividades && progressoAtual.atividades[indexAtual + 1]) {
+        const nextActivity = progressoAtual.atividades[indexAtual + 1];
+        setAtividadeAtualSalva(nextActivity.feita && (nextActivity.avaliacao > 0 || nextActivity.comentario?.trim() !== ""));
+      } else {
+        setAtividadeAtualSalva(false);
+      }
+    } else {
+      setAtividadeAtualSalva(false);
+    }
+  };
+
+  const irParaAtividadeAnterior = () => {
+    setIndexAtual(prev => prev - 1);
+    const storageKey = getStorageKey(faixaEtaria, grauDependencia);
+    const registroSalvo = localStorage.getItem(storageKey);
+    if (registroSalvo) {
+      const progressoAtual = JSON.parse(registroSalvo);
+      if (progressoAtual && progressoAtual.atividades && progressoAtual.atividades[indexAtual - 1]) {
+        const prevActivity = progressoAtual.atividades[indexAtual - 1];
+        setAtividadeAtualSalva(prevActivity.feita && (prevActivity.avaliacao > 0 || prevActivity.comentario?.trim() !== ""));
+      } else {
+        setAtividadeAtualSalva(false);
+      }
+    } else {
+      setAtividadeAtualSalva(false);
+    }
+  };
+
+
+  if (!planoAtual) {
+    return <div>Carregando Plano de Ação ou redirecionando...</div>;
+  }
+
+  const isSaveButtonDisabled = atividadeAtualSalva || 
+                               !atividadesFeitas[indexAtual] || 
+                               (avaliacoes[indexAtual] === 0 && comentarios[indexAtual].trim() === "");
 
   return (
     <div className="plano-container">
-      <h2>{grauDependencia}</h2>
-      <h4>{planoAtual.descricao}</h4>
+      <h2>{planoAtual.titulo}</h2>
+      <h4>Grau de Dependência: {grauDependencia}</h4>
+      <h4>Faixa Etária: {faixaEtaria}</h4>
 
       <div className="atividade-box">
-        <button onClick={() => setIndexAtual(indexAtual - 1)} disabled={indexAtual === 0}>⬅</button>
-        <div className="atividade-titulo">{planoAtual.atividades[indexAtual]}</div>
-        <button onClick={() => setIndexAtual(indexAtual + 1)} disabled={indexAtual === planoAtual.atividades.length - 1}>➡</button>
+        <button onClick={irParaAtividadeAnterior} disabled={indexAtual === 0}>⬅</button>
+        <div className="atividade-titulo">{planoAtual.sugestoes[indexAtual]}</div>
+        <button onClick={irParaProximaAtividade} disabled={indexAtual === planoAtual.sugestoes.length - 1}>➡</button>
       </div>
 
       <div className="atividade-detalhe" style={{ marginBottom: "16px" }}>
         <label>
-          <input type="checkbox" checked={atividadesFeitas[indexAtual]} onChange={toggleAtividade} />
+          <input 
+            type="checkbox" 
+            checked={atividadesFeitas[indexAtual]} 
+            onChange={toggleAtividade} 
+            disabled={atividadeAtualSalva}
+          />
           Marcar como concluída
         </label>
+        {atividadeAtualSalva && (
+            <p style={{ color: 'green', fontWeight: 'bold', marginTop: '5px' }}>
+                Atividade concluída e salva! ✅
+            </p>
+        )}
       </div>
-     
+
       {atividadesFeitas[indexAtual] && (
         <>
           <div className="avaliacao-box" style={{ marginBottom: "16px" }}>
             <label>Avalie a atividade:</label>
             <div className="avaliacao-botoes">
               {[1, 2, 3, 4, 5].map((nota) => (
-                <button key={nota} className={avaliacoes[indexAtual] === nota ? "selecionado" : ""} onClick={() => atualizarAvaliacao(nota)}>{nota}</button>
-              ))
-            }
+                <button 
+                  key={nota} 
+                  className={avaliacoes[indexAtual] === nota ? "selecionado" : ""} 
+                  onClick={() => atualizarAvaliacao(nota)}
+                  disabled={atividadeAtualSalva}
+                >
+                  {nota}
+                </button>
+              ))}
             </div>
           </div>
 
           <div className="comentario-box">
-            <label>Fale mais sobre a experiência da Vitima:</label>
+            <label>Fale mais sobre a experiência:</label>
             <textarea
               value={comentarios[indexAtual]}
               onChange={(e) => atualizarComentario(e.target.value)}
               placeholder="Escreva sua experiência com essa atividade..."
+              disabled={atividadeAtualSalva}
             />
           </div>
         </>
       )}
 
       <div className="botoes">
-        <button onClick={salvarProgresso} disabled={!atividadesFeitas[indexAtual]}>Salvar progresso</button>
+        <button onClick={salvarProgresso} disabled={isSaveButtonDisabled}>Salvar progresso</button>
         <Link to="/registro-de-atividades"><button>Ver Progresso</button></Link>
       </div>
     </div>

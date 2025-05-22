@@ -1,25 +1,35 @@
+// src/pages/RecuperarSenha.tsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 import '../styles/Login.css';
 
 const RecuperarSenha: React.FC = () => {
   const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const navigate = useNavigate();
+  const [mensagem, setMensagem] = useState('');
+  const [erro, setErro] = useState('');
 
-  const handleRecuperarSenha = () => {
+  const handleRecuperarSenha = async () => {
+    setMensagem('');
+    setErro('');
+
     if (!email) {
-      setMessage('Por favor, insira seu e-mail.');
+      setErro('Por favor, insira seu e-mail.');
       return;
     }
 
-    console.log('Enviando link de recuperação para o e-mail:', email);
-    setMessage('Link de recuperação enviado para o seu e-mail.');
+    try {
+      const response = await axios.post('https://off-you.onrender.com/v1/recuperar-senha', { email });
 
-    // Redirecionar para a página onde o usuário vai digitar o token
-    navigate('/nova-senha'); // Aqui você define a rota para a nova tela
+      setMensagem(response.data.message);
+    } catch (err: any) {
+      if (err.response?.data?.message) {
+        setErro(err.response.data.message);
+      } else {
+        setErro('Erro ao tentar enviar o link de recuperação.');
+      }
+    }
   };
 
   return (
@@ -28,7 +38,8 @@ const RecuperarSenha: React.FC = () => {
         <h1>Recuperar Senha</h1>
 
         <form className="login-form">
-          {message && <div style={{ color: 'green', marginBottom: '10px' }}>{message}</div>}
+          {mensagem && <div style={{ color: 'green', marginBottom: '10px' }}>{mensagem}</div>}
+          {erro && <div style={{ color: 'red', marginBottom: '10px' }}>{erro}</div>}
 
           <label htmlFor="email">Email</label>
           <input

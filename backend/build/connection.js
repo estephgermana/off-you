@@ -7,14 +7,14 @@ const knex_1 = __importDefault(require("knex"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const connection = (0, knex_1.default)({
-    client: "mysql2",
+    client: "pg",
     connection: {
         host: process.env.DB_HOST,
-        port: Number(process.env.DB_PORT) || 15615,
+        port: Number(process.env.DB_PORT) || 5432,
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_DATABASE,
-        multipleStatements: true,
+        ssl: { rejectUnauthorized: false },
         connectTimeout: 10000,
         keepAliveInitialDelay: 10000
     },
