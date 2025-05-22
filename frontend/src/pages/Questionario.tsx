@@ -1,30 +1,34 @@
 // src/pages/Questionario.tsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
+
 import '../styles/Questionario.css';
 
 const perguntas = [
-  "A pessoa fica irritada ou ansiosa quando não tem acesso à internet?",
-  "A pessoa passa muito mais tempo online do que inicialmente planejava?",
-  "A pessoa deixa de cumprir compromissos (trabalho, escola, tarefas) por estar conectada à internet?",
-  "A pessoa parece precisar de mais tempo online para se sentir satisfeita?",
-  "Você já percebeu que a pessoa tentou reduzir o tempo online e não conseguiu?",
-  "A pessoa evita encontros familiares ou sociais para ficar conectada?",
-  "A pessoa minimiza ou mente sobre o tempo que passa na internet?",
-  "A pessoa recorre à internet quando está triste, ansiosa ou irritada?",
-  "A pessoa mostra sinais de irritação, tristeza ou nervosismo quando está sem internet?",
-  "O uso da internet está prejudicando o desempenho acadêmico, profissional ou social da pessoa?",
-  "A pessoa parece perder a noção do tempo enquanto está online?",
-  "A pessoa prefere interações online em vez de conversas presenciais?",
-  "A pessoa sacrifica horas de sono para ficar conectada?",
-  "A pessoa demonstra preocupação ou ansiedade excessiva quando não pode usar a internet?",
-  "Você já presenciou a pessoa falhar repetidamente em controlar o tempo de conexão?"
+  "00/15 - Qual a faixa etária da criança?",
+  "01/15 - A pessoa fica irritada ou ansiosa quando não tem acesso à internet?",
+  "02/15 - A pessoa passa muito mais tempo online do que inicialmente planejava?",
+  "03/15 - A pessoa deixa de cumprir compromissos (trabalho, escola, tarefas) por estar conectada à internet?",
+  "04/15 - A pessoa parece precisar de mais tempo online para se sentir satisfeita?",
+  "05/15 - Você já percebeu que a pessoa tentou reduzir o tempo online e não conseguiu?",
+  "06/15 - A pessoa evita encontros familiares ou sociais para ficar conectada?",
+  "07/15 - A pessoa minimiza ou mente sobre o tempo que passa na internet?",
+  "08/15 - A pessoa recorre à internet quando está triste, ansiosa ou irritada?",
+  "09/15 - A pessoa mostra sinais de irritação, tristeza ou nervosismo quando está sem internet?",
+  "10/15 - O uso da internet está prejudicando o desempenho acadêmico, profissional ou social da pessoa?",
+  "11/15 - A pessoa parece perder a noção do tempo enquanto está online?",
+  "12/15 - A pessoa prefere interações online em vez de conversas presenciais?",
+  "13/15 - A pessoa sacrifica horas de sono para ficar conectada?",
+  "14/15 - A pessoa demonstra preocupação ou ansiedade excessiva quando não pode usar a internet?",
+  "15/15 - Você já presenciou a pessoa falhar repetidamente em controlar o tempo de conexão?"
 ];
 
-const alternativas = ["Nunca", "Raramente", "Às vezes", "Frequentemente", "Sempre"];
 
-const resultados = [
+const alternativasQuestao = ["Nunca", "Raramente", "Às vezes", "Frequentemente", "Sempre"];
+
+const alternativasFaixaEtaria = ["0-4 anos", "5-10 anos"];
+
+const resultadosGerais = [
   {
     grau: 'Uso saudável',
     descricao: 'A pessoa tem um relacionamento equilibrado com a internet. Usa a rede para trabalho, estudo ou lazer sem prejuízos evidentes em sua rotina.',
@@ -67,21 +71,34 @@ const resultados = [
 
 const Questionario: React.FC = () => {
   const [indicePergunta, setIndicePergunta] = useState(0);
-  const [respostas, setRespostas] = useState<number[]>(new Array(perguntas.length).fill(-1));
-  const [resultado, setResultado] = useState<null | typeof resultados[0]>(null);
+  const [respostas, setRespostas] = useState<number[]>(new Array(perguntas.length - 1).fill(-1));
+  const [faixaEtariaSelecionada, setFaixaEtariaSelecionada] = useState<string | null>(null);
+  const [resultadoGrau, setResultadoGrau] = useState<typeof resultadosGerais[0] | null>(null);
+
+  const navigate = useNavigate();
 
   const handleResposta = (index: number) => {
-    const novasRespostas = [...respostas];
-    novasRespostas[indicePergunta] = index;
-    setRespostas(novasRespostas);
+    if (indicePergunta === 0) {
+      setFaixaEtariaSelecionada(alternativasFaixaEtaria[index]);
+    } else {
+      const novasRespostas = [...respostas];
+      novasRespostas[indicePergunta - 1] = index;
+      setRespostas(novasRespostas);
+    }
   };
 
   const proximaPergunta = () => {
-    if (respostas[indicePergunta] !== -1) {
-      if (indicePergunta < perguntas.length - 1) {
+    if (indicePergunta === 0) {
+      if (faixaEtariaSelecionada !== null) {
         setIndicePergunta(indicePergunta + 1);
-      } else {
-        calcularResultado();
+      }
+    } else {
+      if (respostas[indicePergunta - 1] !== -1) {
+        if (indicePergunta < perguntas.length - 1) {
+          setIndicePergunta(indicePergunta + 1);
+        } else {
+          calcularResultado();
+        }
       }
     }
   };
@@ -92,70 +109,64 @@ const Questionario: React.FC = () => {
     }
   };
 
-  const calcularResultado = async () => {
+  const calcularResultado = () => {
     const total = respostas.reduce((acc, val) => acc + (val + 1), 0);
-    let grauSelecionado;
+    let grauCalculado;
 
-    if (total <= 30) grauSelecionado = resultados[0];
-    else if (total <= 45) grauSelecionado = resultados[1];
-    else if (total <= 60) grauSelecionado = resultados[2];
-    else grauSelecionado = resultados[3];
+    if (total <= 30) grauCalculado = resultadosGerais[0];
+    else if (total <= 45) grauCalculado = resultadosGerais[1];
+    else if (total <= 60) grauCalculado = resultadosGerais[2];
+    else grauCalculado = resultadosGerais[3];
 
-    setResultado(grauSelecionado);
+    setResultadoGrau(grauCalculado);
+  };
 
-    // Envio para o backend
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.warn("Usuário não autenticado.");
-        return;
-      }
+  const getAlternativasAtuais = () => {
+    return indicePergunta === 0 ? alternativasFaixaEtaria : alternativasQuestao;
+  };
 
-      await axios.post(
-        'http://localhost:3003/v1/resultado-questionario', 
-        {
-          grau: grauSelecionado.grau,
-          descricao: grauSelecionado.descricao,
-          pontuacao: total
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+  const getRespostaAtual = () => {
+    return indicePergunta === 0 ?
+      (faixaEtariaSelecionada !== null ? alternativasFaixaEtaria.indexOf(faixaEtariaSelecionada) : -1) :
+      respostas[indicePergunta - 1];
+  }
+
+  const goToPlanoDeAcao = () => {
+    if (resultadoGrau && faixaEtariaSelecionada) {
+      const encodedFaixaEtaria = encodeURIComponent(faixaEtariaSelecionada);
+      navigate(`/plano-de-acao/${encodedFaixaEtaria}`, {
+        state: {
+          grau: resultadoGrau.grau
         }
-      );
-    } catch (error) {
-      console.error('Erro ao salvar resultado:', error);
+      });
     }
   };
 
   return (
     <div className="questionario">
-      {resultado ? (
+      {resultadoGrau ? (
         <div className="resultado">
-          <h2>{resultado.grau}</h2>
-          <p><strong>Descrição:</strong> {resultado.descricao}</p>
+          <h2>{resultadoGrau.grau}</h2>
+          <p><strong>Descrição:</strong> {resultadoGrau.descricao}</p>
           <p><strong>Possíveis comportamentos:</strong></p>
           <ul>
-            {resultado.comportamentos.map((item, i) => (
+            {resultadoGrau.comportamentos.map((item, i) => (
               <li key={i}>{item}</li>
             ))}
           </ul>
           <p className="frase-final">Confira sugestões de atividades mais completas para ajudar seu amigo ou familiar:</p>
-          <Link to="/cadastro">
-            <button>Cadastre-se para ver o Plano de Ação</button>
-          </Link>
+          <button onClick={goToPlanoDeAcao}>Ver o Plano de Ação Personalizado</button>
         </div>
       ) : (
         <div>
           <h2>{perguntas[indicePergunta]}</h2>
           <div className="alternativas">
-            {alternativas.map((alt, i) => (
-              <label key={i} className={`alternativa ${respostas[indicePergunta] === i ? 'selecionada' : ''}`}>
+            {getAlternativasAtuais().map((alt, i) => (
+              <label key={i} className={`alternativa ${getRespostaAtual() === i ? 'selecionada' : ''}`}>
                 <input
                   type="radio"
                   value={i}
-                  checked={respostas[indicePergunta] === i}
+                  checked={getRespostaAtual() === i}
                   onChange={() => handleResposta(i)}
                 />
                 {alt}
@@ -164,7 +175,16 @@ const Questionario: React.FC = () => {
           </div>
           <div className="botoes">
             <button onClick={voltarPergunta} disabled={indicePergunta === 0}>Voltar</button>
-            <button onClick={proximaPergunta} disabled={respostas[indicePergunta] === -1}>Próximo</button>
+            <button
+              onClick={proximaPergunta}
+              disabled={
+                indicePergunta === 0
+                  ? faixaEtariaSelecionada === null
+                  : respostas[indicePergunta - 1] === -1
+              }
+            >
+              {indicePergunta === perguntas.length - 1 ? 'Finalizar' : 'Próximo'}
+            </button>
           </div>
         </div>
       )}
