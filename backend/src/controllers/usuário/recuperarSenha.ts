@@ -8,12 +8,13 @@ const schemaEmail = yup.object({
   email: yup.string().email().required(),
 });
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail', 
+const transport = nodemailer.createTransport({
+  host: "sandbox.smtp.mailtrap.io",
+  port: 2525,
   auth: {
-    user: process.env.EMAIL_USER, 
-    pass: process.env.EMAIL_PASS, 
-  },
+    user: "e51df9f883856e",
+    pass: "a645257fe7f307"
+  }
 });
 
 export const recuperarSenhaUsuario = async (req: Request, res: Response) => {
@@ -45,7 +46,7 @@ export const recuperarSenhaUsuario = async (req: Request, res: Response) => {
       text: `Clique no link para redefinir sua senha: ${linkRecuperacao}`,
     };
 
-    await transporter.sendMail(mailOptions);
+    await transport.sendMail(mailOptions);
 
     res.status(200).json({
       message: 'Token de recuperação gerado e enviado por e-mail.',

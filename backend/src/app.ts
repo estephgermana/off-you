@@ -1,6 +1,7 @@
 import express, { Express } from 'express';
 import cors from 'cors';
 import { router } from "./endpoints/routes";
+import dotenv from 'dotenv';
 
 const app: Express = express();
 const swaggerUi = require('swagger-ui-express');
@@ -8,6 +9,7 @@ const swaggerDocument = require('../swagger.json');
 
 app.use(express.json());
 app.use(cors());
+dotenv.config();
 
 const options = {
     swaggerOptions: {

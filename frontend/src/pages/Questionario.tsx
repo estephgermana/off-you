@@ -1,6 +1,6 @@
 // src/pages/Questionario.tsx
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/Questionario.css';
 
@@ -69,30 +69,67 @@ const Questionario: React.FC = () => {
   const [indicePergunta, setIndicePergunta] = useState(0);
   const [respostas, setRespostas] = useState<number[]>(new Array(perguntas.length).fill(-1));
   const [resultado, setResultado] = useState<null | typeof resultados[0]>(null);
+  const [carregando, setCarregando] = useState(true);
+  const [jaRespondeuAlerta, setJaRespondeuAlerta] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const verificarResultado = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return setCarregando(false);
+
+      try {
+        const res = await axios.get('http://localhost:3003/v1/validar_resposta_questionario', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (res.data.jaRespondeu) {
+          setResultado({
+            grau: res.data.resultado.grau,
+            descricao: res.data.resultado.descricao,
+            comportamentos: []
+          });
+          setJaRespondeuAlerta(true);
+        }
+      } catch (err) {
+        console.error('Erro ao buscar resultado:', err);
+      } finally {
+        setCarregando(false);
+      }
+    };
+
+    verificarResultado();
+  }, []);
 
   const handleResposta = (index: number) => {
+    if (jaRespondeuAlerta) {
+      alert('Você já respondeu o questionário. Novas respostas não serão salvas.');
+      return;
+    }
     const novasRespostas = [...respostas];
     novasRespostas[indicePergunta] = index;
     setRespostas(novasRespostas);
   };
 
   const proximaPergunta = () => {
+    if (jaRespondeuAlerta) {
+      alert('Você já respondeu o questionário. Novas respostas não serão salvas.');
+      return;
+    }
     if (respostas[indicePergunta] !== -1) {
       if (indicePergunta < perguntas.length - 1) {
         setIndicePergunta(indicePergunta + 1);
       } else {
-        calcularResultado();
+        finalizarQuestionario();
       }
     }
   };
 
   const voltarPergunta = () => {
-    if (indicePergunta > 0) {
-      setIndicePergunta(indicePergunta - 1);
-    }
+    if (indicePergunta > 0) setIndicePergunta(indicePergunta - 1);
   };
 
-  const calcularResultado = async () => {
+  const finalizarQuestionario = () => {
     const total = respostas.reduce((acc, val) => acc + (val + 1), 0);
     let grauSelecionado;
 
@@ -103,26 +140,35 @@ const Questionario: React.FC = () => {
 
     setResultado(grauSelecionado);
 
-    // Envio para o backend
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.warn("Usuário não autenticado.");
-        return;
-      }
+    const token = localStorage.getItem('token');
 
+    if (!token) {
+      localStorage.setItem('respostasPendentes', JSON.stringify({
+        respostas,
+        pontuacao: total,
+        grau: grauSelecionado.grau,
+        descricao: grauSelecionado.descricao
+      }));
+      navigate('/cadastro');
+    } else {
+      enviarResultado(token, grauSelecionado, total);
+    }
+  };
+
+  const enviarResultado = async (
+    token: string,
+    grauSelecionado: typeof resultados[0],
+    total: number
+  ) => {
+    try {
       await axios.post(
-        'http://localhost:3003/v1/resultado-questionario', 
+        'http://localhost:3003/v1/resultado-questionario',
         {
           grau: grauSelecionado.grau,
           descricao: grauSelecionado.descricao,
           pontuacao: total
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
     } catch (error) {
       console.error('Erro ao salvar resultado:', error);
@@ -131,6 +177,12 @@ const Questionario: React.FC = () => {
 
   return (
     <div className="questionario">
+      {jaRespondeuAlerta && (
+        <div style={{ backgroundColor: '#ffdddd', padding: '10px', marginBottom: '15px', border: '1px solid red', borderRadius: '5px' }}>
+          <strong>Atenção:</strong> Você já respondeu este questionário. Novas respostas não serão salvas.
+        </div>
+      )}
+
       {resultado ? (
         <div className="resultado">
           <h2>{resultado.grau}</h2>
@@ -141,17 +193,26 @@ const Questionario: React.FC = () => {
               <li key={i}>{item}</li>
             ))}
           </ul>
-          <p className="frase-final">Confira sugestões de atividades mais completas para ajudar seu amigo ou familiar:</p>
-          <Link to="/cadastro">
-            <button>Cadastre-se para ver o Plano de Ação</button>
-          </Link>
+          <p className="frase-final">
+            Confira sugestões de atividades mais completas para ajudar seu amigo ou familiar:
+          </p>
+          {!jaRespondeuAlerta && (
+            <Link to="/cadastro">
+              <button>Cadastre-se para ver o Plano de Ação</button>
+            </Link>
+          )}
         </div>
+      ) : carregando ? (
+        <p>Carregando...</p>
       ) : (
         <div>
           <h2>{perguntas[indicePergunta]}</h2>
           <div className="alternativas">
             {alternativas.map((alt, i) => (
-              <label key={i} className={`alternativa ${respostas[indicePergunta] === i ? 'selecionada' : ''}`}>
+              <label
+                key={i}
+                className={`alternativa ${respostas[indicePergunta] === i ? 'selecionada' : ''}`}
+              >
                 <input
                   type="radio"
                   value={i}
@@ -163,8 +224,15 @@ const Questionario: React.FC = () => {
             ))}
           </div>
           <div className="botoes">
-            <button onClick={voltarPergunta} disabled={indicePergunta === 0}>Voltar</button>
-            <button onClick={proximaPergunta} disabled={respostas[indicePergunta] === -1}>Próximo</button>
+            <button onClick={voltarPergunta} disabled={indicePergunta === 0}>
+              Voltar
+            </button>
+            <button
+              onClick={proximaPergunta}
+              disabled={respostas[indicePergunta] === -1}
+            >
+              Próximo
+            </button>
           </div>
         </div>
       )}

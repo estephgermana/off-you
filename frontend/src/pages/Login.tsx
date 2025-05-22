@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-
+import { useAuth } from '../context/AuthContext'; 
 import '../styles/Login.css';
 
 const Login: React.FC = () => {
@@ -16,6 +16,8 @@ const Login: React.FC = () => {
       setAvisoLogado(true);
     }
   }, []);
+
+  const { login } = useAuth();
 
   const handleLogin = async () => {
     try {
@@ -33,7 +35,7 @@ const Login: React.FC = () => {
       }
 
       localStorage.setItem('token', data.token);
-
+      login(data.token);
       console.log('Login bem-sucedido!');
       navigate('/');
     } catch (error) {
