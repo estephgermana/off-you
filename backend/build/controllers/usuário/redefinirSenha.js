@@ -35,56 +35,42 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.criarUsuario = void 0;
+exports.redefinirSenha = void 0;
 const connection_1 = __importDefault(require("../../connection"));
-const uuid_1 = require("uuid");
 const yup = __importStar(require("yup"));
 const Authenticator_1 = require("../../services/midleware/Authenticator");
-const schemaCadastro = yup.object({
-    nome: yup.string().min(3, 'Nome muito curto.').required('Nome é obrigatório.'),
-    email: yup.string().email('Formato de email inválido.').required('Email é obrigatório.'),
-    senha: yup.string().min(6, 'A senha deve ter no mínimo 6 caracteres.').required('Senha é obrigatória.'),
-    tipo_usuario: yup.string().default('familiar'),
-    data_nascimento_vitima: yup.date().required('Data de nascimento é obrigatória.'),
+const schemaRedefinir = yup.object({
+    senha: yup.string().min(6).required(),
+    token: yup.string().required(),
 });
-const criarUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const redefinirSenha = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield schemaCadastro.validate(req.body, { abortEarly: false });
-        const { nome, email, senha, data_nascimento_vitima, nivel_proximidade } = req.body;
-        const usuarioExistente = yield (0, connection_1.default)('usuario').where({ email }).first();
-        if (usuarioExistente) {
-            return res.status(400).json({ message: 'Já existe um usuário cadastrado com esse email.' });
+        yield schemaRedefinir.validate(req.body, { abortEarly: false });
+        const { senha, token } = req.body;
+        const auth = new Authenticator_1.Authenticator();
+        const tokenData = auth.getTokenData(token);
+        const usuario = yield (0, connection_1.default)('usuario')
+            .where({ id_usuario: tokenData.id_usuario })
+            .first();
+        if (!usuario) {
+            return res.status(404).json({ message: 'Usuário não encontrado.' });
         }
-        const idUsuario = (0, uuid_1.v4)();
         const hashManager = new Authenticator_1.HashManager();
         const senhaHash = yield hashManager.hash(senha);
-        const tipo_usuario = "familiar";
-        yield connection_1.default.transaction((trx) => __awaiter(void 0, void 0, void 0, function* () {
-            yield trx('usuario').insert({
-                id_usuario: idUsuario,
-                nome,
-                email,
-                senha: senhaHash,
-                tipo_usuario: tipo_usuario,
-                data_cadastro: new Date(),
-                data_nascimento_vitima,
-                nivel_proximidade
-            });
-        }));
-        const auth = new Authenticator_1.Authenticator();
-        const token = auth.generateToken({
-            id_usuario: idUsuario,
-            tipo: tipo_usuario,
-        });
-        res.status(201).json({ message: 'Usuário cadastrado com sucesso.', token });
+        yield (0, connection_1.default)('usuario')
+            .where({ id_usuario: tokenData.id_usuario })
+            .update({ senha: senhaHash });
+        res.status(200).json({ message: 'Senha redefinida com sucesso.' });
     }
     catch (error) {
-        console.error(error);
+        if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+            return res.status(401).json({ message: 'Token inválido ou expirado.' });
+        }
         if (error instanceof yup.ValidationError) {
             return res.status(400).json({ message: 'Erro de validação', errors: error.errors });
         }
-        res.status(500).json({ message: 'Erro inesperado ao cadastrar o usuário.' });
+        res.status(500).json({ message: 'Erro ao redefinir a senha.' });
     }
 });
-exports.criarUsuario = criarUsuario;
-//# sourceMappingURL=criarUsuario.js.map
+exports.redefinirSenha = redefinirSenha;
+//# sourceMappingURL=redefinirSenha.js.map

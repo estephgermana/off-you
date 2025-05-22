@@ -79,7 +79,7 @@ const Questionario: React.FC = () => {
       if (!token) return setCarregando(false);
 
       try {
-        const res = await axios.get('http://localhost:3003/v1/validar_resposta_questionario', {
+        const res = await axios.get('https://off-you.onrender.com/v1/validar_resposta_questionario', {
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -162,7 +162,7 @@ const Questionario: React.FC = () => {
   ) => {
     try {
       await axios.post(
-        'http://localhost:3003/v1/resultado-questionario',
+        'https://off-you.onrender.com/v1/resultado-questionario',
         {
           grau: grauSelecionado.grau,
           descricao: grauSelecionado.descricao,

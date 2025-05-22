@@ -20,7 +20,7 @@ const RecuperarSenha: React.FC = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:3003/v1/recuperar-senha', { email });
+      const response = await axios.post('https://off-you.onrender.com/v1/recuperar-senha', { email });
 
       setMensagem(response.data.message);
     } catch (err: any) {

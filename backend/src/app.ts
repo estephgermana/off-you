@@ -11,6 +11,15 @@ app.use(express.json());
 app.use(cors());
 dotenv.config();
 
+const corsOptions = {
+  origin: 'https://off-you.vercel.app', 
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true, 
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
+
 const options = {
     swaggerOptions: {
         authAction: {

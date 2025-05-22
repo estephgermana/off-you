@@ -27,7 +27,7 @@ const Cadastro: React.FC = () => {
   }
 
   try {
-    const response = await fetch('http://localhost:3003/v1/cadastro', {
+    const response = await fetch('https://off-you.onrender.com/v1/cadastro', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -55,7 +55,7 @@ const Cadastro: React.FC = () => {
       if (respostasPendentes) {
         const { grau, descricao, pontuacao } = JSON.parse(respostasPendentes);
 
-        const resultadoResponse = await fetch('http://localhost:3003/v1/resultado-questionario', {
+        const resultadoResponse = await fetch('https://off-you.onrender.com/v1/resultado-questionario', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

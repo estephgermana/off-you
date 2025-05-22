@@ -35,56 +35,54 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.criarUsuario = void 0;
+exports.recuperarSenhaUsuario = void 0;
 const connection_1 = __importDefault(require("../../connection"));
-const uuid_1 = require("uuid");
-const yup = __importStar(require("yup"));
 const Authenticator_1 = require("../../services/midleware/Authenticator");
-const schemaCadastro = yup.object({
-    nome: yup.string().min(3, 'Nome muito curto.').required('Nome é obrigatório.'),
-    email: yup.string().email('Formato de email inválido.').required('Email é obrigatório.'),
-    senha: yup.string().min(6, 'A senha deve ter no mínimo 6 caracteres.').required('Senha é obrigatória.'),
-    tipo_usuario: yup.string().default('familiar'),
-    data_nascimento_vitima: yup.date().required('Data de nascimento é obrigatória.'),
+const yup = __importStar(require("yup"));
+const nodemailer_1 = __importDefault(require("nodemailer"));
+const schemaEmail = yup.object({
+    email: yup.string().email().required(),
 });
-const criarUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const transport = nodemailer_1.default.createTransport({
+    host: "sandbox.smtp.mailtrap.io",
+    port: 2525,
+    auth: {
+        user: "e51df9f883856e",
+        pass: "a645257fe7f307"
+    }
+});
+const recuperarSenhaUsuario = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield schemaCadastro.validate(req.body, { abortEarly: false });
-        const { nome, email, senha, data_nascimento_vitima, nivel_proximidade } = req.body;
-        const usuarioExistente = yield (0, connection_1.default)('usuario').where({ email }).first();
-        if (usuarioExistente) {
-            return res.status(400).json({ message: 'Já existe um usuário cadastrado com esse email.' });
+        yield schemaEmail.validate(req.body, { abortEarly: false });
+        const { email } = req.body;
+        const usuario = yield (0, connection_1.default)('usuario').where({ email }).first();
+        if (!usuario) {
+            return res.status(404).json({ message: 'Usuário não encontrado.' });
         }
-        const idUsuario = (0, uuid_1.v4)();
-        const hashManager = new Authenticator_1.HashManager();
-        const senhaHash = yield hashManager.hash(senha);
-        const tipo_usuario = "familiar";
-        yield connection_1.default.transaction((trx) => __awaiter(void 0, void 0, void 0, function* () {
-            yield trx('usuario').insert({
-                id_usuario: idUsuario,
-                nome,
-                email,
-                senha: senhaHash,
-                tipo_usuario: tipo_usuario,
-                data_cadastro: new Date(),
-                data_nascimento_vitima,
-                nivel_proximidade
-            });
-        }));
         const auth = new Authenticator_1.Authenticator();
-        const token = auth.generateToken({
-            id_usuario: idUsuario,
-            tipo: tipo_usuario,
+        const tokenRecuperacao = auth.generateToken({
+            id_usuario: usuario.id_usuario,
+            tipo: usuario.tipo_usuario,
+        }, '15m');
+        const linkRecuperacao = `http://localhost:3000/redefinir-senha?token=${tokenRecuperacao}`;
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Recuperação de Senha',
+            text: `Clique no link para redefinir sua senha: ${linkRecuperacao}`,
+        };
+        yield transport.sendMail(mailOptions);
+        res.status(200).json({
+            message: 'Token de recuperação gerado e enviado por e-mail.',
         });
-        res.status(201).json({ message: 'Usuário cadastrado com sucesso.', token });
     }
     catch (error) {
         console.error(error);
         if (error instanceof yup.ValidationError) {
             return res.status(400).json({ message: 'Erro de validação', errors: error.errors });
         }
-        res.status(500).json({ message: 'Erro inesperado ao cadastrar o usuário.' });
+        res.status(500).json({ message: 'Erro ao processar solicitação de recuperação de senha.' });
     }
 });
-exports.criarUsuario = criarUsuario;
-//# sourceMappingURL=criarUsuario.js.map
+exports.recuperarSenhaUsuario = recuperarSenhaUsuario;
+//# sourceMappingURL=recuperarSenha.js.map
