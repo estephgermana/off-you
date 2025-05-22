@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../styles/RegistroAtividade.css";
 
 type AtividadeRegistrada = {
@@ -18,15 +18,13 @@ type RegistroCompleto = {
 
 const RegistroAtividade: React.FC = () => {
   const [registrosExibidos, setRegistrosExibidos] = useState<AtividadeRegistrada[]>([]);
-  
-  const getStorageKey = (fe: string, gd: string) => {
-    const cleanFaixaEtaria = fe.replace(/[^a-zA-Z0-9]/g, '');
-    const cleanGrauDependencia = gd.replace(/[^a-zA-Z0-9]/g, '');
-    return `registros_${cleanFaixaEtaria}_${cleanGrauDependencia}`;
-  };
+  const [ultimaFaixaEtaria, setUltimaFaixaEtaria] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const atividadesConcluidasSalvas: AtividadeRegistrada[] = [];
+    const todosOsRegistrosCompletos: RegistroCompleto[] = [];
+
     const keysInLocalStorage = Object.keys(localStorage);
     const registroKeys = keysInLocalStorage.filter(key => key.startsWith('registros_'));
 
@@ -35,11 +33,12 @@ const RegistroAtividade: React.FC = () => {
         const registroString = localStorage.getItem(key);
         if (registroString) {
           const registroObjeto: RegistroCompleto = JSON.parse(registroString);
-     
+          
           if (registroObjeto && registroObjeto.atividades && Array.isArray(registroObjeto.atividades)) {
-            registroObjeto.atividades.forEach(ativ => {
+            todosOsRegistrosCompletos.push(registroObjeto);
 
-              if (ativ.feita && (ativ.comentario || ativ.avaliacao > 0)) {
+            registroObjeto.atividades.forEach(ativ => {
+              if (ativ.feita && (ativ.avaliacao > 0 || ativ.comentario)) {
                 atividadesConcluidasSalvas.push(ativ);
               }
             });
@@ -52,9 +51,22 @@ const RegistroAtividade: React.FC = () => {
     
     setRegistrosExibidos(atividadesConcluidasSalvas);
 
+    if (todosOsRegistrosCompletos.length > 0) {
+      setUltimaFaixaEtaria(todosOsRegistrosCompletos[0].faixaEtaria);
+    }
+
   }, []);
 
-  const usuario = "Responsável"; 
+  const usuario = "Pai/Mãe";
+
+  const handleVoltarParaPlano = () => {
+    if (ultimaFaixaEtaria) {
+      const encodedFaixaEtaria = encodeURIComponent(ultimaFaixaEtaria);
+      navigate(`/plano-de-acao/${encodedFaixaEtaria}`);
+    } else {
+      navigate('/questionario');
+    }
+  };
 
   return (
     <div className="registro-container">
@@ -77,11 +89,9 @@ const RegistroAtividade: React.FC = () => {
         ))
       )}
 
-      <Link to="/plano-de-acao">
-        <button className="voltar-btn">
-          Voltar para o plano de ação
-        </button>
-      </Link>
+      <button className="voltar-btn" onClick={handleVoltarParaPlano}>
+        Voltar para o plano de ação
+      </button>
     </div>
   );
 };
