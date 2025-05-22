@@ -85,6 +85,7 @@ export default function PlanoDeAcao() {
 
   const grauDependencia = (location.state?.grau as Grau) || "Uso saudável";
   const faixaEtaria = (faixaEtariaParam as FaixaEtaria) || "0-4 anos";
+
   const planoAtual = planosDeAcaoDetalhado[faixaEtaria]?.[grauDependencia];
 
   useEffect(() => {
@@ -98,6 +99,8 @@ export default function PlanoDeAcao() {
   const [atividadesFeitas, setAtividadesFeitas] = useState<boolean[]>([]);
   const [comentarios, setComentarios] = useState<string[]>([]);
   const [avaliacoes, setAvaliacoes] = useState<number[]>([]);
+  const [atividadeAtualSalva, setAtividadeAtualSalva] = useState<boolean>(false); 
+
 
   const getStorageKey = (fe: FaixaEtaria, gd: Grau) => {
     const cleanFaixaEtaria = fe.replace(/[^a-zA-Z0-9]/g, '');
@@ -108,70 +111,97 @@ export default function PlanoDeAcao() {
   useEffect(() => {
     if (planoAtual) {
       const storageKey = getStorageKey(faixaEtaria, grauDependencia);
-      
       const registroSalvo = localStorage.getItem(storageKey);
 
       if (registroSalvo) {
         try {
           const progressoAtual = JSON.parse(registroSalvo);
-
           if (progressoAtual && progressoAtual.atividades) {
-
             if (progressoAtual.grau === grauDependencia && progressoAtual.faixaEtaria === faixaEtaria) {
                 setAtividadesFeitas(progressoAtual.atividades.map((a: any) => a.feita));
-                setComentarios(progressoAtual.atividades.map((a: any) => a.comentario));
+                setComentarios(progressoAtual.atividades.map((a: any) => a.comentario || ""));
                 setAvaliacoes(progressoAtual.atividades.map((a: any) => a.avaliacao || 0));
+
+
+                const isCurrentActivitySaved = progressoAtual.atividades[indexAtual]?.feita && 
+                                               (progressoAtual.atividades[indexAtual]?.avaliacao > 0 || 
+                                                progressoAtual.atividades[indexAtual]?.comentario?.trim() !== "");
+                setAtividadeAtualSalva(isCurrentActivitySaved);
+
             } else {
                 setAtividadesFeitas(new Array(planoAtual.sugestoes.length).fill(false));
                 setComentarios(new Array(planoAtual.sugestoes.length).fill(""));
                 setAvaliacoes(new Array(planoAtual.sugestoes.length).fill(0));
+                setAtividadeAtualSalva(false);
             }
           } else {
-
             setAtividadesFeitas(new Array(planoAtual.sugestoes.length).fill(false));
             setComentarios(new Array(planoAtual.sugestoes.length).fill(""));
             setAvaliacoes(new Array(planoAtual.sugestoes.length).fill(0));
+            setAtividadeAtualSalva(false);
           }
         } catch (e) {
           console.error("Erro ao parsear registro do localStorage:", e);
-
           setAtividadesFeitas(new Array(planoAtual.sugestoes.length).fill(false));
           setComentarios(new Array(planoAtual.sugestoes.length).fill(""));
           setAvaliacoes(new Array(planoAtual.sugestoes.length).fill(0));
+          setAtividadeAtualSalva(false);
         }
       } else {
-
         setAtividadesFeitas(new Array(planoAtual.sugestoes.length).fill(false));
         setComentarios(new Array(planoAtual.sugestoes.length).fill(""));
         setAvaliacoes(new Array(planoAtual.sugestoes.length).fill(0));
+        setAtividadeAtualSalva(false);
       }
     }
-  }, [planoAtual, faixaEtaria, grauDependencia]);
+  }, [planoAtual, faixaEtaria, grauDependencia, indexAtual]);
 
   const toggleAtividade = () => {
-    const novas = [...atividadesFeitas];
-    novas[indexAtual] = !novas[indexAtual];
-    setAtividadesFeitas(novas);
 
+    if (!atividadeAtualSalva) {
+      const novas = [...atividadesFeitas];
+      novas[indexAtual] = !novas[indexAtual];
+      setAtividadesFeitas(novas);
+
+      if (!novas[indexAtual]) {
+          const novasAvaliacoes = [...avaliacoes];
+          novasAvaliacoes[indexAtual] = 0;
+          setAvaliacoes(novasAvaliacoes);
+
+          const novosComentarios = [...comentarios];
+          novosComentarios[indexAtual] = "";
+          setComentarios(novosComentarios);
+      }
+    }
   };
 
   const atualizarComentario = (texto: string) => {
-    const novos = [...comentarios];
-    novos[indexAtual] = texto;
-    setComentarios(novos);
 
+    if (!atividadeAtualSalva) {
+      const novos = [...comentarios];
+      novos[indexAtual] = texto;
+      setComentarios(novos);
+    }
   };
 
   const atualizarAvaliacao = (nota: number) => {
-    const novas = [...avaliacoes];
-    novas[indexAtual] = nota;
-    setAvaliacoes(novas);
+
+    if (!atividadeAtualSalva) {
+      const novas = [...avaliacoes];
+      novas[indexAtual] = nota;
+      setAvaliacoes(novas);
+    }
   };
 
   const salvarProgresso = () => {
     if (!planoAtual) {
       console.warn("Plano de ação não disponível, não é possível salvar.");
       return;
+    }
+
+    if (!atividadesFeitas[indexAtual] || (avaliacoes[indexAtual] === 0 && comentarios[indexAtual].trim() === "")) {
+        alert("Para salvar o progresso, a atividade precisa estar marcada como concluída E ter uma avaliação ou comentário.");
+        return;
     }
 
     const registroParaSalvar = {
@@ -187,17 +217,54 @@ export default function PlanoDeAcao() {
     };
 
     const storageKey = getStorageKey(faixaEtaria, grauDependencia);
- 
     localStorage.setItem(storageKey, JSON.stringify(registroParaSalvar));
     console.log(`Progresso salvo para ${faixaEtaria} - ${grauDependencia} na chave: ${storageKey}`);
     alert("Progresso salvo com sucesso!");
+    setAtividadeAtualSalva(true); 
   };
+
+  const irParaProximaAtividade = () => {
+    setIndexAtual(prev => prev + 1);
+    const storageKey = getStorageKey(faixaEtaria, grauDependencia);
+    const registroSalvo = localStorage.getItem(storageKey);
+    if (registroSalvo) {
+      const progressoAtual = JSON.parse(registroSalvo);
+      if (progressoAtual && progressoAtual.atividades && progressoAtual.atividades[indexAtual + 1]) {
+        const nextActivity = progressoAtual.atividades[indexAtual + 1];
+        setAtividadeAtualSalva(nextActivity.feita && (nextActivity.avaliacao > 0 || nextActivity.comentario?.trim() !== ""));
+      } else {
+        setAtividadeAtualSalva(false);
+      }
+    } else {
+      setAtividadeAtualSalva(false);
+    }
+  };
+
+  const irParaAtividadeAnterior = () => {
+    setIndexAtual(prev => prev - 1);
+    const storageKey = getStorageKey(faixaEtaria, grauDependencia);
+    const registroSalvo = localStorage.getItem(storageKey);
+    if (registroSalvo) {
+      const progressoAtual = JSON.parse(registroSalvo);
+      if (progressoAtual && progressoAtual.atividades && progressoAtual.atividades[indexAtual - 1]) {
+        const prevActivity = progressoAtual.atividades[indexAtual - 1];
+        setAtividadeAtualSalva(prevActivity.feita && (prevActivity.avaliacao > 0 || prevActivity.comentario?.trim() !== ""));
+      } else {
+        setAtividadeAtualSalva(false);
+      }
+    } else {
+      setAtividadeAtualSalva(false);
+    }
+  };
+
 
   if (!planoAtual) {
     return <div>Carregando Plano de Ação ou redirecionando...</div>;
   }
 
-  const isSaveButtonDisabled = !atividadesFeitas[indexAtual] || (comentarios[indexAtual] === "" && avaliacoes[indexAtual] === 0);
+  const isSaveButtonDisabled = atividadeAtualSalva || 
+                               !atividadesFeitas[indexAtual] || 
+                               (avaliacoes[indexAtual] === 0 && comentarios[indexAtual].trim() === "");
 
   return (
     <div className="plano-container">
@@ -206,26 +273,42 @@ export default function PlanoDeAcao() {
       <h4>Faixa Etária: {faixaEtaria}</h4>
 
       <div className="atividade-box">
-        <button onClick={() => setIndexAtual(prev => prev - 1)} disabled={indexAtual === 0}>⬅</button>
+        <button onClick={irParaAtividadeAnterior} disabled={indexAtual === 0}>⬅</button>
         <div className="atividade-titulo">{planoAtual.sugestoes[indexAtual]}</div>
-        <button onClick={() => setIndexAtual(prev => prev + 1)} disabled={indexAtual === planoAtual.sugestoes.length - 1}>➡</button>
+        <button onClick={irParaProximaAtividade} disabled={indexAtual === planoAtual.sugestoes.length - 1}>➡</button>
       </div>
 
       <div className="atividade-detalhe" style={{ marginBottom: "16px" }}>
         <label>
-          <input type="checkbox" checked={atividadesFeitas[indexAtual]} onChange={toggleAtividade} />
+          <input 
+            type="checkbox" 
+            checked={atividadesFeitas[indexAtual]} 
+            onChange={toggleAtividade} 
+            disabled={atividadeAtualSalva}
+          />
           Marcar como concluída
         </label>
+        {atividadeAtualSalva && (
+            <p style={{ color: 'green', fontWeight: 'bold', marginTop: '5px' }}>
+                Atividade concluída e salva! ✅
+            </p>
+        )}
       </div>
 
-      {/* Mostra avaliação e comentário apenas se a atividade estiver marcada como concluída */}
       {atividadesFeitas[indexAtual] && (
         <>
           <div className="avaliacao-box" style={{ marginBottom: "16px" }}>
             <label>Avalie a atividade:</label>
             <div className="avaliacao-botoes">
               {[1, 2, 3, 4, 5].map((nota) => (
-                <button key={nota} className={avaliacoes[indexAtual] === nota ? "selecionado" : ""} onClick={() => atualizarAvaliacao(nota)}>{nota}</button>
+                <button 
+                  key={nota} 
+                  className={avaliacoes[indexAtual] === nota ? "selecionado" : ""} 
+                  onClick={() => atualizarAvaliacao(nota)}
+                  disabled={atividadeAtualSalva}
+                >
+                  {nota}
+                </button>
               ))}
             </div>
           </div>
@@ -236,13 +319,13 @@ export default function PlanoDeAcao() {
               value={comentarios[indexAtual]}
               onChange={(e) => atualizarComentario(e.target.value)}
               placeholder="Escreva sua experiência com essa atividade..."
+              disabled={atividadeAtualSalva}
             />
           </div>
         </>
       )}
 
       <div className="botoes">
-        {}
         <button onClick={salvarProgresso} disabled={isSaveButtonDisabled}>Salvar progresso</button>
         <Link to="/registro-de-atividades"><button>Ver Progresso</button></Link>
       </div>
