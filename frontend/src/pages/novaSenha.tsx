@@ -10,17 +10,17 @@ const NovaSenha: React.FC = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [token, setToken] = useState('');
+
   const navigate = useNavigate();
   const location = useLocation();
-
-  const [token, setToken] = useState('');
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tokenParam = params.get('token');
     if (tokenParam) {
       setToken(tokenParam);
-      fetchEmail(tokenParam); // busca email após receber token
+      fetchEmail(tokenParam); // Corrigido: passa o token correto
     } else {
       setError('Token de redefinição não encontrado na URL.');
     }
@@ -29,12 +29,12 @@ const NovaSenha: React.FC = () => {
   const fetchEmail = async (tokenParam: string) => {
     try {
       const response = await axios.get('https://off-you.onrender.com/v1/validar-token', {
-          headers: {
-          Authorization: `Bearer ${token}`,
-  },
-});
+        headers: {
+          Authorization: `Bearer ${tokenParam}`, // Corrigido aqui
+        },
+      });
 
-      setEmail(response.data.email); 
+      setEmail(response.data.email);
     } catch {
       setError('Token inválido ou expirado.');
     }
