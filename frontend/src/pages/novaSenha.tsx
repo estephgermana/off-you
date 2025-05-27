@@ -20,7 +20,7 @@ const NovaSenha: React.FC = () => {
     const tokenParam = params.get('token');
     if (tokenParam) {
       setToken(tokenParam);
-      fetchEmail(tokenParam); // Corrigido: passa o token correto
+      fetchEmail(tokenParam); 
     } else {
       setError('Token de redefinição não encontrado na URL.');
     }
@@ -30,10 +30,11 @@ const NovaSenha: React.FC = () => {
     try {
       const response = await axios.get('https://off-you.onrender.com/v1/validar-token', {
         headers: {
-          Authorization: `Bearer ${tokenParam}`, // Corrigido aqui
+          Authorization: `Bearer ${tokenParam}`,
         },
       });
-
+      
+      console.log('Resposta do validar-token:', response.data)
       setEmail(response.data.email);
     } catch {
       setError('Token inválido ou expirado.');
