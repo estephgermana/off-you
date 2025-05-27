@@ -2,11 +2,20 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Header.css';
 import logo from '../images/logo.jpg';
-import { useAuth } from '../context/AuthContext'; // 👈 importa
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
-  const { logado, logout } = useAuth(); // 👈 pega status e logout
+
+  const handlePlanoDeAcaoClick = () => {
+    const lastAccessedFaixaEtaria = localStorage.getItem('lastAccessedFaixaEtaria');
+
+    if (lastAccessedFaixaEtaria) {
+      const encodedFaixaEtaria = encodeURIComponent(lastAccessedFaixaEtaria);
+      navigate(`/plano-de-acao/${encodedFaixaEtaria}`);
+    } else {
+      navigate('/questionario');
+    }
+  };
 
   return (
     <header>
@@ -19,38 +28,21 @@ const Header: React.FC = () => {
           <input type="text" placeholder="Buscar..." />
         </div>
 
-        {logado ? (
-          <button
-            onClick={() => {
-              logout();
-              navigate('/login');
-            }}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#666',
-              fontSize: '0.9rem',
-              cursor: 'pointer',
-              textDecoration: 'underline'
-            }}
-          >
-            Sair
-          </button>
-        ) : (
+        <div>
           <button onClick={() => navigate('/login')}>Login</button>
-        )}
+        </div>
       </div>
 
       <div className="bottom-bar">
         <div className="green-bar-buttons">
-          <button className="green-button" onClick={() => navigate('/plano-de-acao')}>
+          <button className="green-button" onClick={handlePlanoDeAcaoClick}>
             Plano de Ação
           </button>
           <button className="green-button" onClick={() => navigate('/')}>
             Sobre OffYou
           </button>
-          <button className="green-button" onClick={() => navigate('/registro-de-atividades')}>
-            Registro de Atividades
+          <button className="green-button" onClick={() => navigate('/contato')}> 
+            Contato
           </button>
         </div>
       </div>
