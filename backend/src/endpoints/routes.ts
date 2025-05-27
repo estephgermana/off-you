@@ -4,7 +4,7 @@ import { criarUsuario } from '../controllers/usuário/criarUsuario';
 import { loginUsuario } from '../controllers/usuário/loginUsuario';
 import { recuperarSenhaUsuario } from '../controllers/usuário/recuperarSenha';
 import { perfilUsuario } from '../controllers/usuário/perfilUsuario';
-import { verificarToken } from '../services/midleware/verificarToken';
+import { validarToken, verificarToken } from '../services/midleware/verificarToken';
 import { editarDadosUsuario } from '../controllers/usuário/editarDadosUsuario';
 import { deletarUsuario } from '../controllers/usuário/deletarUsuario';
 import { redefinirSenha } from "../controllers/usuário/redefinirSenha";
@@ -24,7 +24,7 @@ router.post('/recuperar-senha', recuperarSenhaUsuario);
 router.post('/redefinir-senha', redefinirSenha);
 router.post('/resultado-questionario', verificarToken, resultadoQuestionario);
 router.get('/validar_resposta_questionario', verificarResultadoQuestionario);
-router.get('/validar-token', verificarToken)
+router.get('/validar-token', verificarToken, validarToken)
 
 
 export { router };

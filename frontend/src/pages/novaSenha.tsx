@@ -28,8 +28,13 @@ const NovaSenha: React.FC = () => {
 
   const fetchEmail = async (tokenParam: string) => {
     try {
-      const response = await axios.post('https://off-you.onrender.com/v1/validar-token', { token: tokenParam });
-      setEmail(response.data.email); // supondo que o backend retorne { email: "user@example.com" }
+      const response = await axios.get('https://off-you.onrender.com/v1/validar-token', {
+          headers: {
+          Authorization: `Bearer ${token}`,
+  },
+});
+
+      setEmail(response.data.email); 
     } catch {
       setError('Token inválido ou expirado.');
     }

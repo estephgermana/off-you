@@ -21,3 +21,13 @@ export const verificarToken = (req: Request, res: Response, next: NextFunction) 
     return res.status(401).json({ message: 'Token inválido ou expirado.' });
   }
 };
+
+export const validarToken = async (req: Request, res: Response) => {
+  try {
+    const { tokenData } = req.body;
+
+    return res.status(200).json({ email: tokenData.email });
+  } catch {
+    return res.status(400).json({ message: 'Erro ao validar token.' });
+  }
+};
