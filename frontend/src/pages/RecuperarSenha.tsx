@@ -62,10 +62,24 @@ const RecuperarSenha: React.FC = () => {
         </form>
 
         {linkRecuperacao && (
-          <div style={{ marginTop: '20px' }}>
-            <strong>Link de recuperação:</strong><br />
-            <a href={linkRecuperacao} target="_blank" rel="noopener noreferrer">
-              {linkRecuperacao}
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            <strong>Link de recuperação gerado:</strong><br />
+            <a
+              href={linkRecuperacao}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-block',
+                marginTop: '10px',
+                padding: '10px 20px',
+                backgroundColor: '#6a4b84',
+                color: 'white',
+                borderRadius: '5px',
+                textDecoration: 'none',
+                fontWeight: 'bold',
+              }}
+            >
+              Redefinir Senha
             </a>
           </div>
         )}

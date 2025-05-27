@@ -1,32 +1,60 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import axios from 'axios';
 
 import '../styles/Login.css';
 
 const NovaSenha: React.FC = () => {
-  const [token, setToken] = useState('');
   const [novaSenha, setNovaSenha] = useState('');
   const [confirmarNovaSenha, setConfirmarNovaSenha] = useState('');
   const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleNovaSenha = () => {
-    if ( !novaSenha || !confirmarNovaSenha) {
-      setMessage('Por favor, preencha todos os campos.');
+  const [token, setToken] = useState('');
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tokenParam = params.get('token');
+    if (tokenParam) {
+      setToken(tokenParam);
+    } else {
+      setError('Token de redefinição não encontrado na URL.');
+    }
+  }, [location]);
+
+  const handleNovaSenha = async () => {
+    setMessage('');
+    setError('');
+
+    if (!novaSenha || !confirmarNovaSenha) {
+      setError('Por favor, preencha todos os campos.');
       return;
     }
 
     if (novaSenha !== confirmarNovaSenha) {
-      setMessage('As senhas não coincidem.');
+      setError('As senhas não coincidem.');
       return;
     }
 
-    console.log('Nova senha:', novaSenha);
-    setMessage('Senha alterada com sucesso!');
-    
-    // Após sucesso, redirecionar para a tela de login
-    navigate('/login');
+    try {
+      const response = await axios.post('https://off-you.onrender.com/v1/redefinir-senha', {
+        senha: novaSenha,
+        token: token,
+      });
+
+      setMessage(response.data.message);
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+    } catch (err: any) {
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Erro ao tentar redefinir a senha.');
+      }
+    }
   };
 
   return (
@@ -36,7 +64,7 @@ const NovaSenha: React.FC = () => {
 
         <form className="login-form">
           {message && <div style={{ color: 'green', marginBottom: '10px' }}>{message}</div>}
-
+          {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
 
           <label htmlFor="novaSenha">Nova Senha</label>
           <input
