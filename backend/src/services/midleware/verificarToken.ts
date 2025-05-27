@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Authenticator } from '../midleware/Authenticator';
+import jwt from 'jsonwebtoken';
 
 export const verificarToken = (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -22,11 +23,19 @@ export const verificarToken = (req: Request, res: Response, next: NextFunction) 
   }
 };
 
+
 export const validarToken = async (req: Request, res: Response) => {
   try {
-    const { tokenData } = req.body;
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ message: 'Token ausente' });
+    }
 
-    return res.status(200).json({ email: tokenData.email });
+    const token = authHeader.split(' ')[1];
+
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET!);
+
+    return res.status(200).json({ email: decoded.email });
   } catch {
     return res.status(400).json({ message: 'Erro ao validar token.' });
   }
