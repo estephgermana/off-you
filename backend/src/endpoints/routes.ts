@@ -24,6 +24,7 @@ router.post('/recuperar-senha', recuperarSenhaUsuario);
 router.post('/redefinir-senha', redefinirSenha);
 router.post('/resultado-questionario', verificarToken, resultadoQuestionario);
 router.get('/validar_resposta_questionario', verificarResultadoQuestionario);
+router.get('/validar-token', verificarToken)
 
 
 export { router };
