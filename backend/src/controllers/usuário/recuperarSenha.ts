@@ -9,12 +9,11 @@ const schemaEmail = yup.object({
 });
 
 const transport = nodemailer.createTransport({
-  host: "sandbox.smtp.mailtrap.io",
-  port: 2525,
+  service: "gmail",
   auth: {
-    user: "e51df9f883856e",
-    pass: "a645257fe7f307"
-  }
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
 });
 
 export const recuperarSenhaUsuario = async (req: Request, res: Response) => {
