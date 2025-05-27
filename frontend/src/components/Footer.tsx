@@ -15,7 +15,7 @@ const Footer: React.FC = () => {
 
       <div className="footer-info">
         <div>
-          <p>contato@offyou.com</p>
+          <p>contatooffyou@gmail.com</p>
           <p>Telefone::+5511999999999</p>
         </div>
       </div>
