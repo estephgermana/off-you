@@ -25,7 +25,7 @@ const perguntas = [
 
 const alternativasQuestao = ["Nunca", "Raramente", "Às vezes", "Frequentemente", "Sempre"];
 
-const alternativasFaixaEtaria = ["0-4 anos", "5-10 anos"];
+const alternativasFaixaEtaria = ["0-4 anos", "5-9 anos"];
 
 const resultadosGerais = [
   {
@@ -70,8 +70,6 @@ const resultadosGerais = [
 
 const Questionario: React.FC = () => {
   const [indicePergunta, setIndicePergunta] = useState(0);
-  // O array de respostas terá o tamanho total de perguntas (incluindo a de faixa etária)
-  // O índice da faixa etária (0) será ignorado no cálculo de pontuação, mas a resposta será usada.
   const [respostas, setRespostas] = useState<number[]>(new Array(perguntas.length).fill(-1));
   const [faixaEtariaSelecionada, setFaixaEtariaSelecionada] = useState<string | null>(null);
   const [resultadoGrau, setResultadoGrau] = useState<typeof resultadosGerais[0] | null>(null);
@@ -96,7 +94,7 @@ const Questionario: React.FC = () => {
           setResultadoGrau({
             grau: res.data.resultado.grau,
             descricao: res.data.resultado.descricao,
-            comportamentos: [] // Assumindo que você não está pegando comportamentos do backend aqui
+            comportamentos: []
           });
           setJaRespondeuAlerta(true);
         }
@@ -116,11 +114,11 @@ const Questionario: React.FC = () => {
       return;
     }
 
-    if (indicePergunta === 0) { // Lógica para a primeira pergunta (faixa etária)
+    if (indicePergunta === 0) {
       setFaixaEtariaSelecionada(alternativasFaixaEtaria[index]);
     } else {
       const novasRespostas = [...respostas];
-      novasRespostas[indicePergunta] = index; // Armazena a resposta no índice da pergunta
+      novasRespostas[indicePergunta] = index;
       setRespostas(novasRespostas);
     }
   };
@@ -131,7 +129,6 @@ const Questionario: React.FC = () => {
       return;
     }
 
-    // Validação para a primeira pergunta (faixa etária)
     if (indicePergunta === 0) {
       if (faixaEtariaSelecionada !== null) {
         setIndicePergunta(indicePergunta + 1);
@@ -141,12 +138,11 @@ const Questionario: React.FC = () => {
       return;
     }
 
-    // Validação para as demais perguntas
-    if (respostas[indicePergunta] !== -1) { // Verifique a resposta da pergunta atual
+    if (respostas[indicePergunta] !== -1) {
       if (indicePergunta < perguntas.length - 1) {
         setIndicePergunta(indicePergunta + 1);
       } else {
-        finalizarQuestionario(); // Chama a função que envia para o backend
+        finalizarQuestionario();
       }
     } else {
       alert('Por favor, selecione uma resposta para continuar.');
@@ -159,7 +155,6 @@ const Questionario: React.FC = () => {
     }
   };
 
-  // Função para calcular o grau localmente (apenas para exibição e antes de enviar)
   const calcularGrauLocal = (total: number) => {
     let grauCalculado;
     if (total <= 30) grauCalculado = resultadosGerais[0];
@@ -170,27 +165,24 @@ const Questionario: React.FC = () => {
   };
 
   const finalizarQuestionario = async () => {
-    // Calcula a pontuação ignorando a primeira pergunta (faixa etária)
-    const pontuacaoRespostas = respostas.slice(1); // Pega as respostas a partir do índice 1
+    const pontuacaoRespostas = respostas.slice(1);
     const total = pontuacaoRespostas.reduce((acc, val) => acc + (val + 1), 0);
     
     const grauCalculado = calcularGrauLocal(total);
-    setResultadoGrau(grauCalculado); // Define o resultado no estado para exibição
+    setResultadoGrau(grauCalculado);
 
     const token = localStorage.getItem('token');
 
     if (!token) {
-      // Se não houver token, salva as respostas pendentes no localStorage e redireciona para cadastro
       localStorage.setItem('respostasPendentes', JSON.stringify({
-        respostas: respostas.slice(1), // Salva apenas as respostas das questões
+        respostas: respostas.slice(1),
         pontuacao: total,
         grau: grauCalculado.grau,
         descricao: grauCalculado.descricao,
-        faixa_etaria: faixaEtariaSelecionada // Salva a faixa etária também
+        faixa_etaria: faixaEtariaSelecionada
       }));
       navigate('/cadastro');
     } else {
-      // Se houver token, envia o resultado para o backend
       await enviarResultado(token, grauCalculado, total, faixaEtariaSelecionada);
     }
   };
@@ -208,7 +200,7 @@ const Questionario: React.FC = () => {
           grau: grauSelecionado.grau,
           descricao: grauSelecionado.descricao,
           pontuacao: total,
-          faixa_etaria: faixaEtaria // Incluindo a faixa etária aqui
+          faixa_etaria: faixaEtaria
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -225,7 +217,7 @@ const Questionario: React.FC = () => {
   const getRespostaAtual = () => {
     return indicePergunta === 0 ?
       (faixaEtariaSelecionada !== null ? alternativasFaixaEtaria.indexOf(faixaEtariaSelecionada) : -1) :
-      respostas[indicePergunta]; // Pega a resposta do array `respostas` no índice da pergunta atual
+      respostas[indicePergunta];
   }
 
   const goToPlanoDeAcao = () => {
@@ -258,9 +250,9 @@ const Questionario: React.FC = () => {
             ))}
           </ul>
           <p className="frase-final">Confira sugestões de atividades mais completas para ajudar seu amigo ou familiar:</p>
-          {localStorage.getItem('token') ? ( // Se já tiver token, vai pro plano de ação
+          {localStorage.getItem('token') ? (
             <button onClick={goToPlanoDeAcao}>Ver o Plano de Ação Personalizado</button>
-          ) : ( // Se não tiver token, pede pra cadastrar
+          ) : (
             <Link to="/cadastro">
               <button>Cadastre-se para ver o Plano de Ação</button>
             </Link>
@@ -294,7 +286,7 @@ const Questionario: React.FC = () => {
               disabled={
                 indicePergunta === 0
                   ? faixaEtariaSelecionada === null
-                  : respostas[indicePergunta] === -1 // Verifique a resposta da pergunta atual
+                  : respostas[indicePergunta] === -1
               }
             >
               {indicePergunta === perguntas.length - 1 ? 'Finalizar' : 'Próximo'}
