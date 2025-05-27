@@ -2,9 +2,11 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Header.css';
 import logo from '../images/logo.jpg';
+import { useAuth } from '../context/AuthContext'; 
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
+  const { logado, logout } = useAuth(); 
 
   const handlePlanoDeAcaoClick = () => {
     const lastAccessedFaixaEtaria = localStorage.getItem('lastAccessedFaixaEtaria');
@@ -28,9 +30,26 @@ const Header: React.FC = () => {
           <input type="text" placeholder="Buscar..." />
         </div>
 
-        <div>
+        {logado ? (
+          <button
+            onClick={() => {
+              logout();
+              navigate('/login');
+            }}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#666',
+              fontSize: '0.9rem',
+              cursor: 'pointer',
+              textDecoration: 'underline'
+            }}
+          >
+            Sair
+          </button>
+        ) : (
           <button onClick={() => navigate('/login')}>Login</button>
-        </div>
+        )}
       </div>
 
       <div className="bottom-bar">
@@ -41,7 +60,7 @@ const Header: React.FC = () => {
           <button className="green-button" onClick={() => navigate('/')}>
             Sobre OffYou
           </button>
-          <button className="green-button" onClick={() => navigate('/contato')}> 
+          <button className="green-button" onClick={() => navigate('/contato')}>
             Contato
           </button>
         </div>
