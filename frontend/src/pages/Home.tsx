@@ -17,9 +17,9 @@ const Home: React.FC = () => {
       <div className="sobre-offyou">
         <h2>Sobre OffYou</h2>
         <p>
-          A criação do projeto OffYou se justifica pela necessidade de auxiliar familiares e amigos a identificar e lidar com a dependência de internet em adolescentes, um problema cada vez mais presente na sociedade atual. 
-          Muitas vezes, pessoas próximas não sabem reconhecer os sinais ou como ajudar de forma adequada. 
-          Dessa forma, o projeto não apenas soluciona um problema atual, mas também gera impacto positivo na convivência social e no bem-estar emocional dos envolvidos.
+         A criação do projeto OffYou é uma resposta à necessidade de auxiliar familiares e amigos a identificar e lidar com o uso excessivo de internet e o risco de dependência em crianças de 0 a 9 anos. Escolhemos essa faixa etária com base em dados alarmantes da pesquisa TIC Kids Online Brasil 2023, que mostra um aumento expressivo no acesso precoce à internet. Além disso, seguimos as diretrizes da Organização Mundial da Saúde (OMS), Academia Americana de Pediatria (AAP) e Sociedade Brasileira de Pediatria (SBP), que alertam sobre os potenciais prejuízos do tempo de tela excessivo ao desenvolvimento saudável nessa idade.
+
+Muitas vezes, os cuidadores não sabem reconhecer os sinais de uso problemático ou como intervir. O OffYou oferece suporte para esse desafio, visando um impacto positivo no convívio familiar, no bem-estar emocional e no desenvolvimento integral das crianças.
         </p>
       </div>
     </div>
