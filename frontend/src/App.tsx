@@ -11,7 +11,7 @@ import NovaSenha from './pages/novaSenha';
 import Cadastro from './pages/Cadastro';
 import Questionario from './pages/Questionario';
 import PlanoDeAcao from './pages/PlanoDeAcao';
-import RegistroAtividade from './pages/RegistroAtividade';
+import Contato from './pages/Contato';
 
 const App: React.FC = () => {
   return (
@@ -27,7 +27,7 @@ const App: React.FC = () => {
             <Route path="/cadastro" element={<Cadastro />} />
             <Route path="/questionario" element={<Questionario />} />
             <Route path="/plano-de-acao/:faixaEtaria" element={<PlanoDeAcao />} />
-            <Route path="/registro-de-atividades" element={<RegistroAtividade />} />
+            <Route path="/contato" element={<Contato />} />
           </Routes>
         </main>
         <Footer />
