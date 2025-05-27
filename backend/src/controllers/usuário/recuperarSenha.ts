@@ -34,24 +34,16 @@ export const recuperarSenhaUsuario = async (req: Request, res: Response) => {
       tipo: usuario.tipo_usuario,
     }, '15m');
 
-    
-    const linkRecuperacao = `http://localhost:3000/redefinir-senha?token=${tokenRecuperacao}`;
+    const linkRecuperacao = `https://off-you.vercel.app/redefinir-senha?token=${tokenRecuperacao}`;
 
-    
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Recuperação de Senha',
-      text: `Clique no link para redefinir sua senha: ${linkRecuperacao}`,
-    };
-
-    await transport.sendMail(mailOptions);
-
-    res.status(200).json({
-      message: 'Token de recuperação gerado e enviado por e-mail.',
+    // Em vez de enviar e-mail, retorna o link
+    return res.status(200).json({
+      message: 'Link de recuperação gerado com sucesso.',
+      link: linkRecuperacao,
     });
   } catch (error: any) {
-    console.error(error);
+    console.error("Erro ao gerar link de recuperação:", error);
+
     if (error instanceof yup.ValidationError) {
       return res.status(400).json({ message: 'Erro de validação', errors: error.errors });
     }

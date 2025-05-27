@@ -1,4 +1,3 @@
-// src/pages/RecuperarSenha.tsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -9,10 +8,12 @@ const RecuperarSenha: React.FC = () => {
   const [email, setEmail] = useState('');
   const [mensagem, setMensagem] = useState('');
   const [erro, setErro] = useState('');
+  const [linkRecuperacao, setLinkRecuperacao] = useState('');
 
   const handleRecuperarSenha = async () => {
     setMensagem('');
     setErro('');
+    setLinkRecuperacao('');
 
     if (!email) {
       setErro('Por favor, insira seu e-mail.');
@@ -23,11 +24,12 @@ const RecuperarSenha: React.FC = () => {
       const response = await axios.post('https://off-you.onrender.com/v1/recuperar-senha', { email });
 
       setMensagem(response.data.message);
+      setLinkRecuperacao(response.data.link);
     } catch (err: any) {
       if (err.response?.data?.message) {
         setErro(err.response.data.message);
       } else {
-        setErro('Erro ao tentar enviar o link de recuperação.');
+        setErro('Erro ao tentar gerar o link de recuperação.');
       }
     }
   };
@@ -55,9 +57,18 @@ const RecuperarSenha: React.FC = () => {
             className="submit"
             onClick={handleRecuperarSenha}
           >
-            Enviar Link de Recuperação
+            Gerar Link de Recuperação
           </button>
         </form>
+
+        {linkRecuperacao && (
+          <div style={{ marginTop: '20px' }}>
+            <strong>Link de recuperação:</strong><br />
+            <a href={linkRecuperacao} target="_blank" rel="noopener noreferrer">
+              {linkRecuperacao}
+            </a>
+          </div>
+        )}
 
         <div className="login-link">
           Já tem conta? <Link to="/login">Faça login</Link>
