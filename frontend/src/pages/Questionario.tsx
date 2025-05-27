@@ -5,7 +5,7 @@ import axios from 'axios';
 import '../styles/Questionario.css';
 
 const perguntas = [
-  "00/15 - Qual a faixa etária da criança?",
+  "Qual a faixa etária da criança?",
   "01/15 - A pessoa fica irritada ou ansiosa quando não tem acesso à internet?",
   "02/15 - A pessoa passa muito mais tempo online do que inicialmente planejava?",
   "03/15 - A pessoa deixa de cumprir compromissos (trabalho, escola, tarefas) por estar conectada à internet?",
