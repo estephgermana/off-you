@@ -151,25 +151,26 @@ const Questionario: React.FC = () => {
   };
 
   const finalizarQuestionario = async () => {
-    const respostasValidas = respostas.slice(1);
-    const total = respostasValidas.reduce((acc, val) => acc + (val + 1), 0);
-    const grauCalculado = calcularGrauLocal(total);
-    setResultadoGrau(grauCalculado);
+  const respostasValidas = respostas.slice(1);
+  const total = respostasValidas.reduce((acc, val) => acc + (val + 1), 0);
+  const grauCalculado = calcularGrauLocal(total);
 
-    const token = localStorage.getItem('token');
+  const token = localStorage.getItem('token');
 
-    if (!token) {
-      localStorage.setItem('respostasPendentes', JSON.stringify({
-        respostas: respostasValidas,
-        pontuacao: total,
-        grau: grauCalculado.grau,
-        descricao: grauCalculado.descricao,
-        faixa_etaria: faixaEtariaSelecionada
-      }));
-    } else {
-      await enviarResultado(token, grauCalculado, total, faixaEtariaSelecionada);
-    }
-  };
+  if (!token) {
+    localStorage.setItem('respostasPendentes', JSON.stringify({
+      respostas: respostasValidas,
+      pontuacao: total,
+      grau: grauCalculado.grau,
+      descricao: grauCalculado.descricao,
+      faixa_etaria: faixaEtariaSelecionada
+    }));
+  } else {
+    await enviarResultado(token, grauCalculado, total, faixaEtariaSelecionada);
+  }
+
+  setResultadoGrau(grauCalculado);
+};
 
   const enviarResultado = async (
     token: string,
