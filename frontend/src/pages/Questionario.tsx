@@ -166,7 +166,6 @@ const Questionario: React.FC = () => {
         descricao: grauCalculado.descricao,
         faixa_etaria: faixaEtariaSelecionada
       }));
-      navigate('/cadastro');
     } else {
       await enviarResultado(token, grauCalculado, total, faixaEtariaSelecionada);
     }
@@ -231,12 +230,18 @@ const Questionario: React.FC = () => {
             ))}
           </ul>
           <p className="frase-final">Confira sugestões de atividades mais completas para ajudar seu amigo ou familiar:</p>
+
           {localStorage.getItem('token') ? (
             <button onClick={goToPlanoDeAcao}>Ver o Plano de Ação Personalizado</button>
           ) : (
-            <Link to="/cadastro">
-              <button>Cadastre-se para ver o Plano de Ação</button>
-            </Link>
+            <>
+              <p className="aviso-cadastro" style={{ color: 'red', marginTop: '1rem' }}>
+                <strong>Aviso:</strong> Suas respostas ainda <u>não foram salvas</u>. Cadastre-se para salvá-las e acessar o Plano de Ação.
+              </p>
+              <Link to="/cadastro">
+                <button>Cadastre-se para salvar as respostas</button>
+              </Link>
+            </>
           )}
         </div>
       ) : (
