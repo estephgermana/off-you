@@ -10,6 +10,7 @@ import { deletarUsuario } from '../controllers/usuário/deletarUsuario';
 import { redefinirSenha } from "../controllers/usuário/redefinirSenha";
 import { resultadoQuestionario } from '../controllers/usuário/resultadoQuestionario';
 import { verificarResultadoQuestionario } from '../controllers/usuário/verificaResultadoQuestionario';
+import { obterPlanoUsuario } from '../controllers/planos/obterPlanoUsuario';
 
 const router = Router();
 
@@ -26,5 +27,6 @@ router.post('/resultado-questionario', verificarToken, resultadoQuestionario);
 router.get('/validar_resposta_questionario', verificarResultadoQuestionario);
 router.get('/validar-token', verificarToken, validarToken)
 
+router.get('/usuario/plano_acao', verificarToken, obterPlanoUsuario);
 
 export { router };
