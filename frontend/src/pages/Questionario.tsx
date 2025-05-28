@@ -5,7 +5,7 @@ import axios from 'axios';
 import '../styles/Questionario.css';
 
 const perguntas = [
-  "Qual a faixa etária da criança?",
+  "00/15 - Qual a faixa etária da criança?",
   "01/15 - A pessoa fica irritada ou ansiosa quando não tem acesso à internet?",
   "02/15 - A pessoa passa muito mais tempo online do que inicialmente planejava?",
   "03/15 - A pessoa deixa de cumprir compromissos (trabalho, escola, tarefas) por estar conectada à internet?",
@@ -24,8 +24,7 @@ const perguntas = [
 ];
 
 const alternativasQuestao = ["Nunca", "Raramente", "Às vezes", "Frequentemente", "Sempre"];
-
-const alternativasFaixaEtaria = ["0-4 anos", "5-9 anos"];
+const alternativasFaixaEtaria = ["0-4 anos", "5-10 anos"];
 
 const resultadosGerais = [
   {
@@ -91,11 +90,8 @@ const Questionario: React.FC = () => {
         });
 
         if (res.data.jaRespondeu) {
-          setResultadoGrau({
-            grau: res.data.resultado.grau,
-            descricao: res.data.resultado.descricao,
-            comportamentos: []
-          });
+          const resultadoBackend = resultadosGerais.find(r => r.grau === res.data.resultado.grau);
+          setResultadoGrau(resultadoBackend ?? resultadosGerais[0]);
           setJaRespondeuAlerta(true);
         }
       } catch (err) {
@@ -124,28 +120,20 @@ const Questionario: React.FC = () => {
   };
 
   const proximaPergunta = () => {
-    if (jaRespondeuAlerta) {
-      alert('Você já respondeu o questionário. Novas respostas não serão salvas.');
-      return;
-    }
-
     if (indicePergunta === 0) {
       if (faixaEtariaSelecionada !== null) {
-        setIndicePergunta(indicePergunta + 1);
+        setIndicePergunta(1);
       } else {
-        alert('Por favor, selecione uma faixa etária para continuar.');
+        alert('Por favor, selecione uma faixa etária.');
       }
-      return;
-    }
-
-    if (respostas[indicePergunta] !== -1) {
+    } else if (respostas[indicePergunta] !== -1) {
       if (indicePergunta < perguntas.length - 1) {
         setIndicePergunta(indicePergunta + 1);
       } else {
         finalizarQuestionario();
       }
     } else {
-      alert('Por favor, selecione uma resposta para continuar.');
+      alert('Por favor, selecione uma resposta.');
     }
   };
 
@@ -156,18 +144,15 @@ const Questionario: React.FC = () => {
   };
 
   const calcularGrauLocal = (total: number) => {
-    let grauCalculado;
-    if (total <= 30) grauCalculado = resultadosGerais[0];
-    else if (total <= 45) grauCalculado = resultadosGerais[1];
-    else if (total <= 60) grauCalculado = resultadosGerais[2];
-    else grauCalculado = resultadosGerais[3];
-    return grauCalculado;
+    if (total <= 30) return resultadosGerais[0];
+    else if (total <= 45) return resultadosGerais[1];
+    else if (total <= 60) return resultadosGerais[2];
+    else return resultadosGerais[3];
   };
 
   const finalizarQuestionario = async () => {
-    const pontuacaoRespostas = respostas.slice(1);
-    const total = pontuacaoRespostas.reduce((acc, val) => acc + (val + 1), 0);
-    
+    const respostasValidas = respostas.slice(1);
+    const total = respostasValidas.reduce((acc, val) => acc + (val + 1), 0);
     const grauCalculado = calcularGrauLocal(total);
     setResultadoGrau(grauCalculado);
 
@@ -175,7 +160,7 @@ const Questionario: React.FC = () => {
 
     if (!token) {
       localStorage.setItem('respostasPendentes', JSON.stringify({
-        respostas: respostas.slice(1),
+        respostas: respostasValidas,
         pontuacao: total,
         grau: grauCalculado.grau,
         descricao: grauCalculado.descricao,
@@ -189,44 +174,38 @@ const Questionario: React.FC = () => {
 
   const enviarResultado = async (
     token: string,
-    grauSelecionado: typeof resultadosGerais[0],
+    grau: typeof resultadosGerais[0],
     total: number,
     faixaEtaria: string | null
   ) => {
     try {
       await axios.post(
-        'https://off-you.onrender.com/v1/resultado-questionario', 
+        'https://off-you.onrender.com/v1/resultado-questionario',
         {
-          grau: grauSelecionado.grau,
-          descricao: grauSelecionado.descricao,
+          grau: grau.grau,
+          descricao: grau.descricao,
           pontuacao: total,
           faixa_etaria: faixaEtaria
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log('Resultado do questionário salvo no backend!');
-    } catch (error) {
-      console.error('Erro ao salvar resultado:', error);
+    } catch (err) {
+      console.error('Erro ao salvar resultado:', err);
     }
   };
 
-  const getAlternativasAtuais = () => {
-    return indicePergunta === 0 ? alternativasFaixaEtaria : alternativasQuestao;
-  };
+  const getAlternativasAtuais = () =>
+    indicePergunta === 0 ? alternativasFaixaEtaria : alternativasQuestao;
 
-  const getRespostaAtual = () => {
-    return indicePergunta === 0 ?
-      (faixaEtariaSelecionada !== null ? alternativasFaixaEtaria.indexOf(faixaEtariaSelecionada) : -1) :
-      respostas[indicePergunta];
-  }
+  const getRespostaAtual = () =>
+    indicePergunta === 0
+      ? faixaEtariaSelecionada !== null ? alternativasFaixaEtaria.indexOf(faixaEtariaSelecionada) : -1
+      : respostas[indicePergunta];
 
   const goToPlanoDeAcao = () => {
     if (resultadoGrau && faixaEtariaSelecionada) {
-      const encodedFaixaEtaria = encodeURIComponent(faixaEtariaSelecionada);
-      navigate(`/plano-de-acao/${encodedFaixaEtaria}`, {
-        state: {
-          grau: resultadoGrau.grau
-        }
+      navigate(`/plano-de-acao/${encodeURIComponent(faixaEtariaSelecionada)}`, {
+        state: { grau: resultadoGrau.grau }
       });
     }
   };
@@ -234,19 +213,21 @@ const Questionario: React.FC = () => {
   return (
     <div className="questionario">
       {jaRespondeuAlerta && (
-        <div style={{ backgroundColor: '#ffdddd', padding: '10px', marginBottom: '15px', border: '1px solid red', borderRadius: '5px' }}>
+        <div className="alerta">
           <strong>Atenção:</strong> Você já respondeu este questionário. Novas respostas não serão salvas.
         </div>
       )}
 
-      {resultadoGrau ? (
+      {carregando ? (
+        <p>Carregando...</p>
+      ) : resultadoGrau ? (
         <div className="resultado">
           <h2>{resultadoGrau.grau}</h2>
           <p><strong>Descrição:</strong> {resultadoGrau.descricao}</p>
           <p><strong>Possíveis comportamentos:</strong></p>
           <ul>
-            {resultadoGrau.comportamentos.map((item, i) => (
-              <li key={i}>{item}</li>
+            {resultadoGrau.comportamentos.map((comportamento, index) => (
+              <li key={index}>{comportamento}</li>
             ))}
           </ul>
           <p className="frase-final">Confira sugestões de atividades mais completas para ajudar seu amigo ou familiar:</p>
@@ -258,17 +239,12 @@ const Questionario: React.FC = () => {
             </Link>
           )}
         </div>
-      ) : carregando ? (
-        <p>Carregando...</p>
       ) : (
         <div>
           <h2>{perguntas[indicePergunta]}</h2>
           <div className="alternativas">
             {getAlternativasAtuais().map((alt, i) => (
-              <label
-                key={i}
-                className={`alternativa ${getRespostaAtual() === i ? 'selecionada' : ''}`}
-              >
+              <label key={i} className={`alternativa ${getRespostaAtual() === i ? 'selecionada' : ''}`}>
                 <input
                   type="radio"
                   value={i}
@@ -281,14 +257,7 @@ const Questionario: React.FC = () => {
           </div>
           <div className="botoes">
             <button onClick={voltarPergunta} disabled={indicePergunta === 0}>Voltar</button>
-            <button
-              onClick={proximaPergunta}
-              disabled={
-                indicePergunta === 0
-                  ? faixaEtariaSelecionada === null
-                  : respostas[indicePergunta] === -1
-              }
-            >
+            <button onClick={proximaPergunta}>
               {indicePergunta === perguntas.length - 1 ? 'Finalizar' : 'Próximo'}
             </button>
           </div>
