@@ -32,6 +32,7 @@ export const recuperarSenhaUsuario = async (req: Request, res: Response) => {
     const tokenRecuperacao = auth.generateToken({
       id_usuario: usuario.id_usuario,
       tipo: usuario.tipo_usuario,
+      email: usuario.email
     }, '15m');
 
     const linkRecuperacao = `https://off-you.vercel.app/redefinir-senha?token=${tokenRecuperacao}`;
