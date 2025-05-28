@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Authenticator } from '../midleware/Authenticator';
 import jwt from 'jsonwebtoken';
 
+
 export const verificarToken = (req: Request, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
@@ -33,7 +34,7 @@ export const validarToken = async (req: Request, res: Response) => {
 
     const token = authHeader.split(' ')[1];
 
-    const decoded: any = jwt.verify(token, process.env.JWT_SECRET!);
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET_KEY!);
 
     return res.status(200).json({ email: decoded.email });
   } catch {

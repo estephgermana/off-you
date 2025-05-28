@@ -18,12 +18,10 @@ const NovaSenha: React.FC = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tokenParam = params.get('token');
-    if (tokenParam) {
-      setToken(tokenParam);
-      fetchEmail(tokenParam); 
-    } else {
-      setError('Token de redefinição não encontrado na URL.');
-    }
+  if (tokenParam) {
+    setToken(tokenParam);
+    fetchEmail(tokenParam); 
+  }
   }, [location]);
 
   const fetchEmail = async (tokenParam: string) => {
@@ -33,7 +31,7 @@ const NovaSenha: React.FC = () => {
           Authorization: `Bearer ${tokenParam}`,
         },
       });
-      
+
       console.log('Resposta do validar-token:', response.data)
       setEmail(response.data.email);
     } catch {
