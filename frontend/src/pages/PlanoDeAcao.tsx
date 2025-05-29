@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import '../styles/PlanoDeAcao.css';
 
@@ -26,12 +26,22 @@ interface PlanoApi {
     atividades?: { id_atividade: number; descricao: string }[];
 }
 
+// Função para decodificar token JWT e extrair payload
+function parseJwt(token: string | null) {
+    if (!token) return null;
+    try {
+        return JSON.parse(atob(token.split('.')[1]));
+    } catch {
+        return null;
+    }
+}
+
 export default function PlanoDeAcao() {
-    const location = useLocation();
     const navigate = useNavigate();
 
-    const userId = location.state?.userId;
     const token = localStorage.getItem("token") || "";
+    const payload = parseJwt(token);
+    const userId = payload?.id_usuario;
 
     const [planoAtual, setPlanoAtual] = useState<PlanoApi | null>(null);
     const [loading, setLoading] = useState(true);
@@ -248,7 +258,7 @@ export default function PlanoDeAcao() {
         return (
             <div>
                 <p>Erro: {errorMsg}</p>
-                <button onClick={() => navigate('/questionario')}>Voltar ao questionário</button>
+                <button onClick={() => navigate('/login')}>Voltar ao login</button>
             </div>
         );
     }
@@ -266,105 +276,77 @@ export default function PlanoDeAcao() {
     return (
         <div className="plano-container">
             <h2>{planoAtual.titulo}</h2>
-            <h4>Grau de Dependência: {planoAtual.grauDependencia}</h4>
-            <h4>Faixa Etária: {planoAtual.faixaEtaria}</h4>
-
-            <div className="tab-navigation">
+            <div className="tabs">
                 <button
-                    className={activeTab === "sugestoes" ? "active-tab" : ""}
+                    className={activeTab === "sugestoes" ? "active" : ""}
                     onClick={() => setActiveTab("sugestoes")}
                 >
-                    Sugestões de Atividades ({activitiesState.filter(a => !a.saved).length})
+                    Atividades Sugeridas
                 </button>
                 <button
-                    className={activeTab === "realizadas" ? "active-tab" : ""}
+                    className={activeTab === "realizadas" ? "active" : ""}
                     onClick={() => setActiveTab("realizadas")}
                 >
-                    Atividades Realizadas ({activitiesState.filter(a => a.saved).length})
+                    Atividades Realizadas
                 </button>
             </div>
 
-            <div className="plan-of-action">
-                {allActivitiesAreSaved && activeTab === "sugestoes" && (
-                    <div className="completion-message">
-                        <h3>Parabéns! Todas as atividades sugeridas foram concluídas!</h3>
-                        <p>
-                            Sua dedicação é fundamental para o desenvolvimento saudável da criança. Lembre-se de que o acompanhamento é um processo contínuo.
-                            <b> Continue realizando atividades offline e buscando novas experiências com seu filho(a).</b>
-                        </p>
-                        <p>
-                            Para um suporte mais aprofundado e personalizado, <b>recomendamos o acompanhamento de um profissional qualificado, como um psicólogo infantil ou pedagogo.</b> Eles podem oferecer orientações valiosas para a jornada da criança e da família.
-                        </p>
-                    </div>
+            {activeTab === "sugestoes" && allActivitiesAreSaved && (
+                <p>Parabéns! Você já salvou todas as atividades sugeridas.</p>
+            )}
+
+            <ul className="activities-list">
+                {activitiesToDisplay.length === 0 && (
+                    <li>Nenhuma atividade nesta aba.</li>
                 )}
 
-                {activitiesToDisplay.length === 0 && activeTab === "realizadas" && !allActivitiesAreSaved && (
-                    <p className="no-activities-message">
-                        Você ainda não concluiu ou salvou nenhuma atividade. Comece marcando as sugestões no painel "Sugestões de Atividades".
-                    </p>
-                )}
-
-                {activitiesToDisplay.length === 0 && activeTab === "sugestoes" && (
-                    <p className="no-activities-message">
-                        Não há atividades sugeridas para mostrar.
-                    </p>
-                )}
-
-                {activitiesToDisplay.map(activity => {
-                    const index = activity.originalIndex;
+                {activitiesToDisplay.map((activity, index) => {
+                    const idx = activity.originalIndex;
+                    const descricao = planoAtual.sugestoes[idx];
                     return (
-                        <div
-                            key={index}
-                            className={`activity-item ${activity.saved ? "saved-activity" : ""}`}
-                        >
-                            <div className="activity-header">
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        checked={activity.feita}
-                                        disabled={activity.saved}
-                                        onChange={() => toggleActivity(index)}
-                                    />{" "}
-                                    {planoAtual.sugestoes[index]}
-                                </label>
-                            </div>
+                        <li key={idx} className={`activity-item ${activity.feita ? "done" : ""}`}>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={activity.feita}
+                                    disabled={activity.saved}
+                                    onChange={() => toggleActivity(idx)}
+                                />
+                                {descricao}
+                            </label>
 
-                            {activity.feita && (
-                                <div className="activity-details">
+                            {activity.feita && !activity.saved && (
+                                <>
                                     <textarea
-                                        placeholder="Comentário (opcional)"
-                                        disabled={activity.saved}
+                                        placeholder="Comentário"
                                         value={activity.comentario}
-                                        onChange={e => updateComment(index, e.target.value)}
+                                        onChange={e => updateComment(idx, e.target.value)}
                                     />
-                                    <div className="rating-container">
-                                        <span>Avaliação: </span>
-                                        {[1, 2, 3, 4, 5].map(star => (
-                                            <button
-                                                key={star}
-                                                disabled={activity.saved}
-                                                className={activity.avaliacao >= star ? "star-selected" : "star"}
-                                                onClick={() => updateRating(index, star)}
-                                                type="button"
+                                    <div className="rating">
+                                        {[1, 2, 3, 4, 5].map(nota => (
+                                            <span
+                                                key={nota}
+                                                className={nota <= activity.avaliacao ? "selected" : ""}
+                                                onClick={() => updateRating(idx, nota)}
                                             >
                                                 ★
-                                            </button>
+                                            </span>
                                         ))}
                                     </div>
-                                    {!activity.saved && (
-                                        <button
-                                            className="save-button"
-                                            onClick={() => saveActivity(activity)}
-                                        >
-                                            Salvar Atividade
-                                        </button>
-                                    )}
-                                </div>
+                                    <button onClick={() => saveActivity(activity)}>Salvar</button>
+                                </>
                             )}
-                        </div>
+
+                            {activity.saved && (
+                                <>
+                                    <p><b>Comentário:</b> {activity.comentario || "(sem comentário)"}</p>
+                                    <p><b>Avaliação:</b> {activity.avaliacao} ★</p>
+                                </>
+                            )}
+                        </li>
                     );
                 })}
-            </div>
+            </ul>
         </div>
     );
 }
