@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import '../styles/PlanoDeAcao.css';
 
 type Grau = "Uso saudável" | "Dependência leve" | "Dependência moderada" | "Dependência severa";
@@ -12,120 +12,40 @@ interface ActivityState {
     avaliacao: number;
     saved: boolean;
     originalIndex: number;
+    id_atividade?: number;
+    id_plano?: number;
 }
 
-const planosDeAcaoDetalhado: Record<FaixaEtaria, Record<Grau, { titulo: string; sugestoes: string[] }>> = {
-    '0-4 anos': {
-        'Uso saudável': {
-            titulo: 'Plano de Ação: Uso Saudável (0-4 anos)',
-            sugestoes: [
-                'Mantenha o ambiente familiar rico em estímulos offline (brinquedos, livros, atividades ao ar livre).',
-                'Limite o tempo de tela para no máximo 1 hora por dia, sempre com supervisão.',
-                'Priorize brincadeiras interativas e tempo de qualidade em família.',
-                'Crie momentos de "desconexão" programados para toda a família.',
-                'Apresente novas texturas e sons através de brincadeiras sensoriais.',
-                'Incentive o uso de blocos e encaixes para desenvolver coordenação.'
-            ]
-        },
-        'Dependência leve': {
-            titulo: 'Plano de Ação: Dependência Leve (0-4 anos)',
-            sugestoes: [
-                'Crie rotinas bem definidas para o uso de telas, com horários fixos e curtos.',
-                'Ofereça alternativas divertidas e envolventes longe das telas, como pintura, massinha, blocos de montar.',
-                'Aumente o tempo de interação um-a-um com a criança, com brincadeiras que estimulem a criatividade e a coordenação motora.',
-                'Utilize temporizadores visíveis para o tempo de tela.',
-                'Comece a explorar parques e playgrounds como principal fonte de diversão.',
-                'Cante músicas e leia livros interativos para desviar o foco das telas.'
-            ]
-        },
-        'Dependência moderada': {
-            titulo: 'Plano de Ação: Dependência Moderada (0-4 anos)',
-            sugestoes: [
-                'Reduza drasticamente o tempo de tela, preferencialmente eliminando-o temporariamente para reeducação.',
-                'Busque atividades sensoriais e motoras que capturem a atenção da criança (parques, natação, caça ao tesouro).',
-                'Considere a busca por apoio profissional (pediatra, psicólogo infantil) para orientação e manejo do comportamento.',
-                'Crie um "canto offline" em casa com brinquedos e livros convidativos.',
-                'Organize encontros com outras crianças para brincadeiras em grupo.',
-                'Pratique jogos de imitação e faz de conta para estimular a criatividade.'
-            ]
-        },
-        'Dependência severa': {
-            titulo: 'Plano de Ação: Dependência Severa (0-4 anos)',
-            sugestoes: [
-                'Intervenção imediata: corte total do acesso às telas e remoção de dispositivos eletrônicos do ambiente da criança.',
-                'Busque apoio psicológico e pedagógico especializado para a criança e a família.',
-                'Crie um ambiente rico em estímulos não digitais e promova o máximo de interação social e física.',
-                'Trabalhe com o profissional para um "detox digital" gradual ou abrupto, conforme a recomendação.',
-                'Priorize terapias de brincadeira e desenvolvimento infantil.',
-                'Documente e compartilhe os comportamentos e avanços com os especialistas.'
-            ]
-        }
-    },
-    '5-9 anos': {
-        'Uso saudável': {
-            titulo: 'Plano de Ação: Uso Saudável (5-9 anos)',
-            sugestoes: [
-                'Incentive o uso consciente da internet para aprendizado e lazer, com supervisão parental.',
-                'Estimule hobbies e atividades extracurriculares (esportes, música, artes).',
-                'Mantenha o diálogo aberto sobre os perigos e benefícios da internet, ensinando sobre segurança online.',
-                'Estabeleça "zonas livres de tela" em casa, como a mesa de jantar.',
-                'Promova jogos de tabuleiro e atividades em grupo sem tecnologia.',
-                'Incentive a leitura de livros de acordo com a idade e interesses.'
-            ]
-        },
-        'Dependência leve': {
-            titulo: 'Plano de Ação: Dependência Leve (5-9 anos)',
-            sugestoes: [
-                'Defina regras claras de tempo de tela e conteúdo, com acordos e consequências.',
-                'Incentive a participação em atividades em grupo e brincadeiras ao ar livre com amigos.',
-                'Explore novos interesses e talentos da criança que não envolvam telas, como leitura, jogos de tabuleiro ou culinária.',
-                'Crie um "contrato de tela" com a criança, com metas e recompensas.',
-                'Ajude a criança a encontrar amigos para brincar presencialmente.',
-                'Limitem o uso de telas antes de dormir para melhorar a qualidade do sono.'
-            ]
-        },
-        'Dependência moderada': {
-            titulo: 'Plano de Ação: Dependência Moderada (5-9 anos)',
-            sugestoes: [
-                'Estabeleça um cronograma rigoroso de uso da internet, com períodos de "desintoxicação digital".',
-                'Aumente o envolvimento em atividades familiares e sociais, buscando reconectar a criança com o mundo real.',
-                'Considere a busca por aconselhamento psicológico para a criança e orientação para os pais.',
-                'Implemente "dias sem tela" ou "períodos de tela zero".',
-                'Incentive a participação em esportes ou clubes que exijam foco e disciplina.',
-                'Ensine a criança a identificar e expressar suas emoções, buscando alternativas à fuga para as telas.'
-            ]
-        },
-        'Dependência severa': {
-            titulo: 'Plano de Ação: Dependência Severa (5-9 anos)',
-            sugestoes: [
-                'Intervenção profissional é crucial: procure um psicólogo infantil ou psiquiatra especializado em dependência digital.',
-                'Restrição total ou quase total do acesso à internet, com acompanhamento e supervisão constante.',
-                'Implemente um plano de reabilitação que inclua terapias, atividades sociais e educacionais, e apoio familiar intensivo.',
-                'Crie um ambiente que favoreça a interação social e atividades físicas, longe de dispositivos.',
-                'Colabore ativamente com a escola para monitorar o comportamento e o desempenho.',
-                'Prepare-se para possíveis resistências e trabalhe com a criança e a família para entender a raiz da dependência.'
-            ]
-        }
-    }
-};
+interface PlanoApi {
+    titulo: string;
+    sugestoes: string[];
+    grauDependencia: Grau;
+    faixaEtaria: FaixaEtaria;
+    id_plano?: number;
+    atividades?: { id_atividade: number; descricao: string }[];
+}
 
 export default function PlanoDeAcao() {
     const location = useLocation();
     const navigate = useNavigate();
-    const { faixaEtaria: faixaEtariaParam } = useParams<{ faixaEtaria: string }>();
 
-    const grauDependencia = (location.state?.grau as Grau) || "Uso saudável";
-    const faixaEtaria = (faixaEtariaParam as FaixaEtaria) || "0-4 anos";
+    // Pega userId do location.state
+    const userId = location.state?.userId;
 
-    const planoAtual = planosDeAcaoDetalhado[faixaEtaria]?.[grauDependencia];
+    // Suponha que você tenha um jeito de pegar o token (ex: contexto, localStorage, etc)
+    // Ajuste esta linha conforme seu fluxo de autenticação:
+    const token = localStorage.getItem("token") || "";
 
+    const [planoAtual, setPlanoAtual] = useState<PlanoApi | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const [activitiesState, setActivitiesState] = useState<ActivityState[]>([]);
     const [activeTab, setActiveTab] = useState<ActiveTab>("sugestoes");
 
-    const getStorageKey = (fe: FaixaEtaria, gd: Grau) => {
-        const cleanFaixaEtaria = fe.replace(/[^a-zA-Z0-9]/g, '');
-        const cleanGrauDependencia = gd.replace(/[^a-zA-Z0-9]/g, '');
-        return `registros_${cleanFaixaEtaria}_${cleanGrauDependencia}`;
+    const getStorageKey = (faixaEtaria: FaixaEtaria, grauDependencia: Grau) => {
+        const cleanFaixaEtaria = faixaEtaria.replace(/[^a-zA-Z0-9]/g, '');
+        const cleanGrauDependencia = grauDependencia.replace(/[^a-zA-Z0-9]/g, '');
+        return `registros_${cleanFaixaEtaria}_${cleanGrauDependencia}_${userId || "anon"}`;
     };
 
     const createDefaultActivityState = (index: number): ActivityState => ({
@@ -136,64 +56,95 @@ export default function PlanoDeAcao() {
         originalIndex: index,
     });
 
-    useEffect(() => {
-        if (!planoAtual || !Object.keys(planosDeAcaoDetalhado).includes(faixaEtaria)) {
-            console.warn("Plano de ação não encontrado para a combinação de faixa etária e grau. Redirecionando.");
-            navigate('/questionario');
+    const fetchPlanoUsuario = async () => {
+        if (!userId) {
+            setErrorMsg("Usuário não identificado. Faça login novamente.");
+            setLoading(false);
             return;
         }
 
-        const storageKey = getStorageKey(faixaEtaria, grauDependencia);
-        const registroSalvo = localStorage.getItem(storageKey);
+        try {
+            const response = await fetch('/api/obterPlanoUsuario', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
 
-        let initialActivities: ActivityState[] = [];
-
-        if (registroSalvo) {
-            try {
-                const progressoAtual = JSON.parse(registroSalvo);
-                if (progressoAtual && progressoAtual.activities &&
-                    progressoAtual.grau === grauDependencia &&
-                    progressoAtual.faixaEtaria === faixaEtaria) {
-                    initialActivities = progressoAtual.activities.filter((activity: ActivityState) =>
-                        typeof activity.originalIndex === 'number' && activity.originalIndex < planoAtual.sugestoes.length
-                    );
-                } else {
-                    console.log("Mismatched or invalid saved data, initializing new activities.");
-                }
-            } catch (e) {
-                console.error("Erro ao parsear registro do localStorage, inicializando novas atividades:", e);
+            if (!response.ok) {
+                throw new Error(`Erro na API: ${response.statusText}`);
             }
+
+            const data: PlanoApi = await response.json();
+
+            if (!data || !data.sugestoes || !data.titulo) {
+                throw new Error("Plano inválido recebido da API.");
+            }
+
+            setPlanoAtual(data);
+
+            const storageKey = getStorageKey(data.faixaEtaria, data.grauDependencia);
+            const registroSalvo = localStorage.getItem(storageKey);
+            let initialActivities: ActivityState[] = [];
+
+            if (registroSalvo) {
+                try {
+                    const progressoAtual = JSON.parse(registroSalvo);
+                    if (
+                        progressoAtual &&
+                        progressoAtual.activities &&
+                        progressoAtual.grau === data.grauDependencia &&
+                        progressoAtual.faixaEtaria === data.faixaEtaria
+                    ) {
+                        initialActivities = progressoAtual.activities.filter((activity: ActivityState) =>
+                            typeof activity.originalIndex === 'number' &&
+                            activity.originalIndex < data.sugestoes.length
+                        );
+                    }
+                } catch {
+                    // ignorar erro de JSON
+                }
+            }
+
+            const mergedActivities = data.sugestoes.map((_, index) => {
+                const savedActivity = initialActivities.find(act => act.originalIndex === index);
+                const defaultActivity = createDefaultActivityState(index);
+
+                const id_atividade = data.atividades && data.atividades[index]?.id_atividade;
+
+                return {
+                    ...defaultActivity,
+                    ...savedActivity,
+                    id_atividade,
+                    id_plano: data.id_plano,
+                };
+            });
+
+            setActivitiesState(mergedActivities);
+
+        } catch (error: any) {
+            setErrorMsg(error.message || "Erro desconhecido ao carregar plano.");
+        } finally {
+            setLoading(false);
         }
+    };
 
-        const mergedActivities = planoAtual.sugestoes.map((_, index) => {
-            const savedActivity = initialActivities.find(act => act.originalIndex === index);
-            return savedActivity || createDefaultActivityState(index);
-        });
-
-        setActivitiesState(mergedActivities);
-
-    }, [planoAtual, faixaEtaria, grauDependencia, navigate]);
-
+    useEffect(() => {
+        fetchPlanoUsuario();
+    }, []);
 
     const toggleActivity = (originalIndex: number) => {
         setActivitiesState(prev => {
             const newState = [...prev];
-            const activityIndexInState = newState.findIndex(act => act.originalIndex === originalIndex);
-
-            if (activityIndexInState === -1) {
-                console.warn(`Activity with originalIndex ${originalIndex} not found in state.`);
-                return prev;
-            }
-
-            const currentActivity = newState[activityIndexInState];
-
-            if (!currentActivity.saved) {
-                const updatedActivity = { ...currentActivity, feita: !currentActivity.feita };
-                if (!updatedActivity.feita) {
-                    updatedActivity.comentario = "";
-                    updatedActivity.avaliacao = 0;
+            const idx = newState.findIndex(act => act.originalIndex === originalIndex);
+            if (idx === -1) return prev;
+            const current = newState[idx];
+            if (!current.saved) {
+                const updated = { ...current, feita: !current.feita };
+                if (!updated.feita) {
+                    updated.comentario = "";
+                    updated.avaliacao = 0;
                 }
-                newState[activityIndexInState] = updatedActivity;
+                newState[idx] = updated;
             }
             return newState;
         });
@@ -202,12 +153,11 @@ export default function PlanoDeAcao() {
     const updateComment = (originalIndex: number, text: string) => {
         setActivitiesState(prev => {
             const newState = [...prev];
-            const activityIndexInState = newState.findIndex(act => act.originalIndex === originalIndex);
-            if (activityIndexInState === -1) return prev;
-
-            const currentActivity = newState[activityIndexInState];
-            if (!currentActivity.saved) {
-                newState[activityIndexInState] = { ...currentActivity, comentario: text };
+            const idx = newState.findIndex(act => act.originalIndex === originalIndex);
+            if (idx === -1) return prev;
+            const current = newState[idx];
+            if (!current.saved) {
+                newState[idx] = { ...current, comentario: text };
             }
             return newState;
         });
@@ -216,32 +166,70 @@ export default function PlanoDeAcao() {
     const updateRating = (originalIndex: number, nota: number) => {
         setActivitiesState(prev => {
             const newState = [...prev];
-            const activityIndexInState = newState.findIndex(act => act.originalIndex === originalIndex);
-            if (activityIndexInState === -1) return prev;
-
-            const currentActivity = newState[activityIndexInState];
-            if (!currentActivity.saved) {
-                newState[activityIndexInState] = { ...currentActivity, avaliacao: nota };
+            const idx = newState.findIndex(act => act.originalIndex === originalIndex);
+            if (idx === -1) return prev;
+            const current = newState[idx];
+            if (!current.saved) {
+                newState[idx] = { ...current, avaliacao: nota };
             }
             return newState;
         });
     };
 
-    const saveActivity = (activityToSave: ActivityState) => {
-        if (!planoAtual) {
-            console.warn("Plano de ação não disponível, não é possível salvar.");
-            return;
+    const enviarAtividadeParaBackend = async (activity: ActivityState) => {
+        if (!userId || !planoAtual) {
+            alert("Usuário ou plano não encontrado para salvar atividade no servidor.");
+            return false;
         }
+        if (activity.id_atividade == null || planoAtual.id_plano == null) {
+            alert("IDs da atividade ou plano não encontrados.");
+            return false;
+        }
+
+        try {
+            const response = await fetch('/api/diario-atividade', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    id_atividade: activity.id_atividade,
+                    id_plano: planoAtual.id_plano,
+                    feita: activity.feita,
+                    comentario: activity.comentario,
+                    avaliacao: activity.avaliacao,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                alert(`Erro ao salvar atividade no servidor: ${errorData.message || response.statusText}`);
+                return false;
+            }
+
+            return true;
+
+        } catch (error) {
+            alert("Erro de rede ao salvar atividade.");
+            return false;
+        }
+    };
+
+    const saveActivity = async (activityToSave: ActivityState) => {
+        if (!planoAtual) return;
 
         if (!activityToSave.feita || (activityToSave.avaliacao === 0 && activityToSave.comentario.trim() === "")) {
             alert("Para salvar, marque a atividade como concluída E adicione uma avaliação/comentário.");
             return;
         }
-
         if (activityToSave.saved) {
             alert("Esta atividade já foi salva e não pode ser alterada.");
             return;
         }
+
+        const sucesso = await enviarAtividadeParaBackend(activityToSave);
+        if (!sucesso) return;
 
         setActivitiesState(prev => {
             const newState = prev.map(activity => {
@@ -252,22 +240,34 @@ export default function PlanoDeAcao() {
             });
 
             const registroParaSalvar = {
-                grau: grauDependencia,
-                faixaEtaria: faixaEtaria,
+                grau: planoAtual.grauDependencia,
+                faixaEtaria: planoAtual.faixaEtaria,
                 activities: newState,
                 data: new Date().toLocaleString(),
             };
 
-            const storageKey = getStorageKey(faixaEtaria, grauDependencia);
+            const storageKey = getStorageKey(planoAtual.faixaEtaria, planoAtual.grauDependencia);
             localStorage.setItem(storageKey, JSON.stringify(registroParaSalvar));
-            console.log(`Atividade ${activityToSave.originalIndex + 1} salva para ${faixaEtaria} - ${grauDependencia}`);
             alert("Atividade salva com sucesso!");
             return newState;
         });
     };
 
+    if (loading) {
+        return <div>Carregando plano de ação...</div>;
+    }
+
+    if (errorMsg) {
+        return (
+            <div>
+                <p>Erro: {errorMsg}</p>
+                <button onClick={() => navigate('/questionario')}>Voltar ao questionário</button>
+            </div>
+        );
+    }
+
     if (!planoAtual) {
-        return <div>Carregando Plano de Ação ou redirecionando...</div>;
+        return <div>Plano de ação não encontrado.</div>;
     }
 
     const allActivitiesAreSaved = activitiesState.length > 0 && activitiesState.every(activity => activity.saved);
@@ -279,8 +279,8 @@ export default function PlanoDeAcao() {
     return (
         <div className="plano-container">
             <h2>{planoAtual.titulo}</h2>
-            <h4>Grau de Dependência: {grauDependencia}</h4>
-            <h4>Faixa Etária: {faixaEtaria}</h4>
+            <h4>Grau de Dependência: {planoAtual.grauDependencia}</h4>
+            <h4>Faixa Etária: {planoAtual.faixaEtaria}</h4>
 
             <div className="tab-navigation">
                 <button
@@ -303,96 +303,76 @@ export default function PlanoDeAcao() {
                         <h3>Parabéns! Todas as atividades sugeridas foram concluídas!</h3>
                         <p>
                             Sua dedicação é fundamental para o desenvolvimento saudável da criança. Lembre-se de que o acompanhamento é um processo contínuo.
-                            **Continue realizando atividades offline e buscando novas experiências com seu filho(a).**
+                            <b> Continue realizando atividades offline e buscando novas experiências com seu filho(a).</b>
                         </p>
                         <p>
-                            Para um suporte mais aprofundado e personalizado, **recomendamos o acompanhamento de um profissional qualificado, como um psicólogo infantil ou pedagogo.** Eles podem oferecer orientações valiosas para a jornada da criança e da família.
+                            Para um suporte mais aprofundado e personalizado, <b>recomendamos o acompanhamento de um profissional qualificado, como um psicólogo infantil ou pedagogo.</b> Eles podem oferecer orientações valiosas para a jornada da criança e da família.
                         </p>
                     </div>
                 )}
+
                 {activitiesToDisplay.length === 0 && activeTab === "realizadas" && !allActivitiesAreSaved && (
                     <p className="no-activities-message">
-                        Você ainda não concluiu ou salvou nenhuma atividade. Comece marcando as sugestões!
+                        Você ainda não concluiu ou salvou nenhuma atividade. Comece marcando as sugestões no painel "Sugestões de Atividades".
                     </p>
                 )}
-                {activitiesToDisplay.length === 0 && activeTab === "sugestoes" && !allActivitiesAreSaved && (
-                     <p className="no-activities-message">
-                         Todas as atividades sugeridas foram salvas. Verifique a aba "Atividades Realizadas".
-                     </p>
+
+                {activitiesToDisplay.length === 0 && activeTab === "sugestoes" && (
+                    <p className="no-activities-message">
+                        Não há atividades sugeridas para mostrar.
+                    </p>
                 )}
 
-
-                {activitiesToDisplay.map((activity) => {
-                    const suggestionText = planoAtual.sugestoes[activity.originalIndex];
-
-                    if (suggestionText === undefined) {
-                        console.warn(`Suggestion text undefined for originalIndex ${activity.originalIndex}. Skipping card.`);
-                        return null;
-                    }
-
-                    const isSaveButtonEnabled =
-                        !activity.saved &&
-                        activity.feita &&
-                        (activity.avaliacao > 0 || activity.comentario.trim() !== "");
-
+                {activitiesToDisplay.map(activity => {
+                    const index = activity.originalIndex;
                     return (
-                        <div className="card" key={activity.originalIndex}>
-                            <h4>
-                                Atividade {activity.originalIndex + 1}
-                                {activity.saved && (
-                                    <span className="activity-status"> Concluída! ✅</span>
-                                )}
-                            </h4>
-                            <p>{suggestionText}</p>
-
-                            <div className="atividade-detalhe">
+                        <div
+                            key={index}
+                            className={`activity-item ${activity.saved ? "saved-activity" : ""}`}
+                        >
+                            <div className="activity-header">
                                 <label>
                                     <input
                                         type="checkbox"
                                         checked={activity.feita}
-                                        onChange={() => toggleActivity(activity.originalIndex)}
                                         disabled={activity.saved}
-                                    />
-                                    Marcar como concluída
+                                        onChange={() => toggleActivity(index)}
+                                    />{" "}
+                                    {planoAtual.sugestoes[index]}
                                 </label>
                             </div>
 
-                            { (activity.feita || activity.saved) && (
-                                <>
-                                    <div className="avaliacao-box">
-                                        <label>Avalie a atividade:</label>
-                                        <div className="avaliacao-botoes">
-                                            {[1, 2, 3, 4, 5].map((nota) => (
-                                                <button
-                                                    key={nota}
-                                                    className={activity.avaliacao === nota ? "selecionado" : ""}
-                                                    onClick={() => updateRating(activity.originalIndex, nota)}
-                                                    disabled={activity.saved}
-                                                >
-                                                    {nota}
-                                                </button>
-                                            ))}
-                                        </div>
+                            {activity.feita && (
+                                <div className="activity-details">
+                                    <textarea
+                                        placeholder="Comentário (opcional)"
+                                        disabled={activity.saved}
+                                        value={activity.comentario}
+                                        onChange={e => updateComment(index, e.target.value)}
+                                    />
+                                    <div className="rating-container">
+                                        <span>Avaliação: </span>
+                                        {[1, 2, 3, 4, 5].map(star => (
+                                            <button
+                                                key={star}
+                                                disabled={activity.saved}
+                                                className={activity.avaliacao >= star ? "star-selected" : "star"}
+                                                onClick={() => updateRating(index, star)}
+                                                type="button"
+                                            >
+                                                ★
+                                            </button>
+                                        ))}
                                     </div>
-
-                                    <div className="comentario-box-card">
-                                        <label>Fale mais sobre a experiência:</label>
-                                        <textarea
-                                            value={activity.comentario}
-                                            onChange={(e) => updateComment(activity.originalIndex, e.target.value)}
-                                            placeholder="Escreva sua experiência com essa atividade..."
-                                            disabled={activity.saved}
-                                        />
-                                    </div>
-
-                                    <button
-                                        className="salvar-atividade-individual"
-                                        onClick={() => saveActivity(activity)}
-                                        disabled={!isSaveButtonEnabled}
-                                    >
-                                        Salvar Atividade
-                                    </button>
-                                </>
+                                    {!activity.saved && (
+                                        <button
+                                            className="save-button"
+                                            onClick={() => saveActivity(activity)}
+                                        >
+                                            Salvar Atividade
+                                        </button>
+                                    )}
+                                </div>
                             )}
                         </div>
                     );

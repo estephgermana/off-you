@@ -11,10 +11,11 @@ import { redefinirSenha } from "../controllers/usuário/redefinirSenha";
 import { resultadoQuestionarioComPlano } from '../controllers/usuário/resultadoQuestionario';
 import { verificarResultadoQuestionario } from '../controllers/usuário/verificaResultadoQuestionario';
 import { obterPlanoUsuario } from '../controllers/planos/obterPlanoUsuario';
+import { salvarAtividadeDiario } from '../controllers/planos/salvarAtividade';
 
 const router = Router();
 
-//Usuario
+// Usuario
 router.post('/cadastro', criarUsuario);
 router.post('/login', loginUsuario);  
 router.patch('/recuperar-senha', recuperarSenhaUsuario);
@@ -25,8 +26,9 @@ router.post('/recuperar-senha', recuperarSenhaUsuario);
 router.post('/redefinir-senha', redefinirSenha);
 router.post('/resultado-questionario', verificarToken, resultadoQuestionarioComPlano);
 router.get('/validar_resposta_questionario', verificarResultadoQuestionario);
-router.get('/validar-token', verificarToken, validarToken)
+router.get('/validar-token', verificarToken, validarToken);
 
-router.get('/usuario/plano_acao', verificarToken, obterPlanoUsuario);
+router.get('/obterPlanoUsuario', verificarToken, obterPlanoUsuario);
+router.post('/diario-atividade', verificarToken, salvarAtividadeDiario);
 
 export { router };
