@@ -276,77 +276,124 @@ export default function PlanoDeAcao() {
     return (
         <div className="plano-container">
             <h2>{planoAtual.titulo}</h2>
-            <div className="tabs">
+
+            <div className="tab-navigation">
                 <button
-                    className={activeTab === "sugestoes" ? "active" : ""}
+                    className={activeTab === "sugestoes" ? "active-tab" : ""}
                     onClick={() => setActiveTab("sugestoes")}
                 >
-                    Atividades Sugeridas
+                    Sugestões de Atividades ({activitiesToDisplay.filter(a => !a.saved).length})
                 </button>
                 <button
-                    className={activeTab === "realizadas" ? "active" : ""}
+                    className={activeTab === "realizadas" ? "active-tab" : ""}
                     onClick={() => setActiveTab("realizadas")}
                 >
-                    Atividades Realizadas
+                    Atividades Realizadas ({activitiesToDisplay.filter(a => a.saved).length})
                 </button>
             </div>
 
-            {activeTab === "sugestoes" && allActivitiesAreSaved && (
-                <p>Parabéns! Você já salvou todas as atividades sugeridas.</p>
-            )}
-
-            <ul className="activities-list">
-                {activitiesToDisplay.length === 0 && (
-                    <li>Nenhuma atividade nesta aba.</li>
+            <div className="plan-of-action">
+                {allActivitiesAreSaved && activeTab === "sugestoes" && (
+                    <div className="completion-message">
+                        <h3>Parabéns! Todas as atividades sugeridas foram concluídas!</h3>
+                        <p>
+                            Sua dedicação é fundamental para o desenvolvimento saudável da criança. Lembre-se de que o acompanhamento é um processo contínuo.
+                            <b> Continue realizando atividades offline e buscando novas experiências com seu filho(a).</b>
+                        </p>
+                        <p>
+                            Para um suporte mais aprofundado e personalizado, <b>recomendamos o acompanhamento de um profissional qualificado, como um psicólogo infantil ou pedagogo.</b> Eles podem oferecer orientações valiosas para a jornada da criança e da família.
+                        </p>
+                    </div>
                 )}
 
-                {activitiesToDisplay.map((activity, index) => {
+                {activitiesToDisplay.length === 0 && activeTab === "realizadas" && !allActivitiesAreSaved && (
+                    <p className="no-activities-message">
+                        Você ainda não concluiu ou salvou nenhuma atividade. Comece marcando as sugestões!
+                    </p>
+                )}
+
+                {activitiesToDisplay.length === 0 && activeTab === "sugestoes" && !allActivitiesAreSaved && (
+                    <p className="no-activities-message">
+                        Todas as atividades sugeridas foram salvas. Verifique a aba "Atividades Realizadas".
+                    </p>
+                )}
+
+                {activitiesToDisplay.map((activity) => {
                     const idx = activity.originalIndex;
                     const descricao = planoAtual.sugestoes[idx];
+                    if (descricao === undefined) {
+                        console.warn(`Descrição indefinida para originalIndex ${idx}. Pulando.`);
+                        return null;
+                    }
+
+                    const isSaveButtonEnabled =
+                        !activity.saved &&
+                        activity.feita &&
+                        (activity.avaliacao > 0 || activity.comentario.trim() !== "");
+
                     return (
-                        <li key={idx} className={`activity-item ${activity.feita ? "done" : ""}`}>
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={activity.feita}
-                                    disabled={activity.saved}
-                                    onChange={() => toggleActivity(idx)}
-                                />
-                                {descricao}
-                            </label>
+                        <div className="card" key={idx}>
+                            <h4>
+                                Atividade {idx + 1}
+                                {activity.saved && (
+                                    <span className="activity-status"> Concluída! ✅</span>
+                                )}
+                            </h4>
+                            <p>{descricao}</p>
 
-                            {activity.feita && !activity.saved && (
-                                <>
-                                    <textarea
-                                        placeholder="Comentário"
-                                        value={activity.comentario}
-                                        onChange={e => updateComment(idx, e.target.value)}
+                            <div className="atividade-detalhe">
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        checked={activity.feita}
+                                        disabled={activity.saved}
+                                        onChange={() => toggleActivity(idx)}
                                     />
-                                    <div className="rating">
-                                        {[1, 2, 3, 4, 5].map(nota => (
-                                            <span
-                                                key={nota}
-                                                className={nota <= activity.avaliacao ? "selected" : ""}
-                                                onClick={() => updateRating(idx, nota)}
-                                            >
-                                                ★
-                                            </span>
-                                        ))}
-                                    </div>
-                                    <button onClick={() => saveActivity(activity)}>Salvar</button>
-                                </>
-                            )}
+                                    Marcar como concluída
+                                </label>
+                            </div>
 
-                            {activity.saved && (
+                            {(activity.feita || activity.saved) && (
                                 <>
-                                    <p><b>Comentário:</b> {activity.comentario || "(sem comentário)"}</p>
-                                    <p><b>Avaliação:</b> {activity.avaliacao} ★</p>
+                                    <div className="avaliacao-box">
+                                        <label>Avalie a atividade:</label>
+                                        <div className="avaliacao-botoes">
+                                            {[1, 2, 3, 4, 5].map((nota) => (
+                                                <button
+                                                    key={nota}
+                                                    className={activity.avaliacao === nota ? "selecionado" : ""}
+                                                    onClick={() => updateRating(idx, nota)}
+                                                    disabled={activity.saved}
+                                                >
+                                                    {nota}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="comentario-box-card">
+                                        <label>Fale mais sobre a experiência:</label>
+                                        <textarea
+                                            placeholder="Escreva sua experiência com essa atividade..."
+                                            value={activity.comentario}
+                                            onChange={(e) => updateComment(idx, e.target.value)}
+                                            disabled={activity.saved}
+                                        />
+                                    </div>
+
+                                    <button
+                                        className="salvar-atividade-individual"
+                                        onClick={() => saveActivity(activity)}
+                                        disabled={!isSaveButtonEnabled}
+                                    >
+                                        Salvar Atividade
+                                    </button>
                                 </>
                             )}
-                        </li>
+                        </div>
                     );
                 })}
-            </ul>
+            </div>
         </div>
     );
 }
