@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 import '../styles/PlanoDeAcao.css';
 
 type Grau = "Uso saudável" | "Dependência leve" | "Dependência moderada" | "Dependência severa";
@@ -29,11 +30,7 @@ export default function PlanoDeAcao() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Pega userId do location.state
     const userId = location.state?.userId;
-
-    // Suponha que você tenha um jeito de pegar o token (ex: contexto, localStorage, etc)
-    // Ajuste esta linha conforme seu fluxo de autenticação:
     const token = localStorage.getItem("token") || "";
 
     const [planoAtual, setPlanoAtual] = useState<PlanoApi | null>(null);
@@ -64,17 +61,11 @@ export default function PlanoDeAcao() {
         }
 
         try {
-            const response = await fetch('/api/obterPlanoUsuario', {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
+            const response = await axios.get<PlanoApi>('https://off-you.onrender.com/v1/obterPlanoUsuario', {
+                headers: { Authorization: `Bearer ${token}` },
             });
 
-            if (!response.ok) {
-                throw new Error(`Erro na API: ${response.statusText}`);
-            }
-
-            const data: PlanoApi = await response.json();
+            const data = response.data;
 
             if (!data || !data.sugestoes || !data.titulo) {
                 throw new Error("Plano inválido recebido da API.");
@@ -101,7 +92,7 @@ export default function PlanoDeAcao() {
                         );
                     }
                 } catch {
-                    // ignorar erro de JSON
+                    // ignorar erro JSON
                 }
             }
 
@@ -122,7 +113,7 @@ export default function PlanoDeAcao() {
             setActivitiesState(mergedActivities);
 
         } catch (error: any) {
-            setErrorMsg(error.message || "Erro desconhecido ao carregar plano.");
+            setErrorMsg(error.response?.data?.message || error.message || "Erro desconhecido ao carregar plano.");
         } finally {
             setLoading(false);
         }
@@ -187,31 +178,27 @@ export default function PlanoDeAcao() {
         }
 
         try {
-            const response = await fetch('/api/diario-atividade', {
-                method: 'POST',
+            const response = await axios.post('https://off-you.onrender.com/v1/diario-atividade', {
+                id_atividade: activity.id_atividade,
+                id_plano: planoAtual.id_plano,
+                feita: activity.feita,
+                comentario: activity.comentario,
+                avaliacao: activity.avaliacao,
+            }, {
                 headers: {
-                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    id_atividade: activity.id_atividade,
-                    id_plano: planoAtual.id_plano,
-                    feita: activity.feita,
-                    comentario: activity.comentario,
-                    avaliacao: activity.avaliacao,
-                }),
+                }
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                alert(`Erro ao salvar atividade no servidor: ${errorData.message || response.statusText}`);
+            if (response.status !== 200 && response.status !== 201) {
+                alert(`Erro ao salvar atividade no servidor: ${response.statusText}`);
                 return false;
             }
 
             return true;
 
-        } catch (error) {
-            alert("Erro de rede ao salvar atividade.");
+        } catch (error: any) {
+            alert(error.response?.data?.message || "Erro de rede ao salvar atividade.");
             return false;
         }
     };
