@@ -72,7 +72,7 @@ export const resultadoQuestionarioComPlano = async (req: Request, res: Response)
 
       if (!plano) throw new Error('Plano não encontrado para esta faixa etária e grau');
 
-      const atividades = await trx('attvidade')
+      const atividades = await trx('atividade')
         .where({ id_tipo_plano: plano.id_tipo_plano })
         .select('id_attvidade', 'titulo', 'descricao');
 
