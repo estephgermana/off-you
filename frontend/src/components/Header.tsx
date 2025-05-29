@@ -8,17 +8,6 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   const { logado, logout } = useAuth(); 
 
-  const handlePlanoDeAcaoClick = () => {
-    const lastAccessedFaixaEtaria = localStorage.getItem('lastAccessedFaixaEtaria');
-
-    if (lastAccessedFaixaEtaria) {
-      const encodedFaixaEtaria = encodeURIComponent(lastAccessedFaixaEtaria);
-      navigate(`/plano-de-acao/${encodedFaixaEtaria}`);
-    } else {
-      navigate('/questionario');
-    }
-  };
-
   return (
     <header>
       <div className="top-bar">
@@ -54,7 +43,7 @@ const Header: React.FC = () => {
 
       <div className="bottom-bar">
         <div className="green-bar-buttons">
-          <button className="green-button" onClick={handlePlanoDeAcaoClick}>
+          <button className="green-button" onClick={() => navigate('/plano-de-acao')}>
             Plano de Ação
           </button>
           <button className="green-button" onClick={() => navigate('/')}>
