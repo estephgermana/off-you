@@ -4,7 +4,6 @@ import * as yup from 'yup';
 import { v4 as uuidv4 } from 'uuid';
 import { Authenticator } from '../../services/midleware/Authenticator';
 
-// Schema de validação
 const schemaResultado = yup.object({
   grau: yup.string().required('Grau é obrigatório')
     .oneOf(['Uso saudável', 'Dependência leve', 'Dependência moderada', 'Dependência severa'], 'Grau inválido'),
@@ -12,11 +11,10 @@ const schemaResultado = yup.object({
   pontuacao: yup.number().required('Pontuação é obrigatória').min(0).max(100),
 });
 
-// Função para calcular faixa etária
 function calcularFaixaEtaria(dataNascimento: Date): string {
   const hoje = new Date();
   const idade = hoje.getFullYear() - dataNascimento.getFullYear();
-  
+
   if (idade >= 0 && idade <= 4) return '0-4 anos';
   if (idade >= 5 && idade <= 9) return '5-9 anos';
   throw new Error('Faixa etária não suportada');
@@ -24,25 +22,17 @@ function calcularFaixaEtaria(dataNascimento: Date): string {
 
 export const resultadoQuestionarioComPlano = async (req: Request, res: Response) => {
   try {
-    // Validação dos dados
     await schemaResultado.validate(req.body, { abortEarly: false });
 
-    // Autenticação
     const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ message: 'Token não fornecido' });
-    }
+    if (!token) return res.status(401).json({ message: 'Token não fornecido' });
 
     const authenticator = new Authenticator();
     const payload = authenticator.getTokenData(token);
-
-    if (!payload || !payload.id_usuario) {
-      return res.status(401).json({ message: 'Token inválido' });
-    }
+    if (!payload || !payload.id_usuario) return res.status(401).json({ message: 'Token inválido' });
 
     const usuarioId = payload.id_usuario;
 
-    // Verifica se já existe resposta
     const respostaExistente = await knex('resultados_questionario')
       .where({ usuario_id: usuarioId })
       .first();
@@ -51,7 +41,6 @@ export const resultadoQuestionarioComPlano = async (req: Request, res: Response)
       return res.status(400).json({ message: 'Você já respondeu o questionário.' });
     }
 
-    // Busca dados do usuário
     const usuario = await knex('usuario')
       .where({ id_usuario: usuarioId })
       .select('data_nascimento_vitima')
@@ -61,15 +50,12 @@ export const resultadoQuestionarioComPlano = async (req: Request, res: Response)
       return res.status(400).json({ message: 'Data de nascimento não cadastrada.' });
     }
 
-    // Calcula faixa etária
     const faixaEtaria = calcularFaixaEtaria(new Date(usuario.data_nascimento_vitima));
     const { grau, descricao, pontuacao } = req.body;
 
-    // Inicia transação
     const trx = await knex.transaction();
 
     try {
-      // Salva resultado do questionário
       const id_resultado = uuidv4();
       await trx('resultados_questionario').insert({
         id_resultado,
@@ -80,29 +66,34 @@ export const resultadoQuestionarioComPlano = async (req: Request, res: Response)
         data_resposta: knex.fn.now()
       });
 
-      // Busca o plano correspondente
       const plano = await trx('tipo_plano_acad')
-        .where({
-          faixa_etaria: faixaEtaria,
-          grau_dependencia: grau
-        })
+        .where({ faixa_etaria: faixaEtaria, grau_dependencia: grau })
         .first();
 
-      if (!plano) {
-        throw new Error('Plano não encontrado para esta faixa etária e grau');
-      }
+      if (!plano) throw new Error('Plano não encontrado para esta faixa etária e grau');
 
-      // Busca atividades do plano
       const atividades = await trx('attvidade')
         .where({ id_tipo_plano: plano.id_tipo_plano })
         .select('id_attvidade', 'titulo', 'descricao');
 
-      // Commit da transação
+      // Inserir as atividades no diário
+      const registrosDiario = atividades.map(atividade => ({
+        id_diario: uuidv4(),
+        id_plano: plano.id_tipo_plano,
+        id_atividade: atividade.id_attvidade,
+        id_usuario: usuarioId,
+        comentario: null,
+        data_registro: knex.fn.now(),
+        avaliacao: null,
+        feita: false
+      }));
+
+      await trx('diario_atividade').insert(registrosDiario);
+
       await trx.commit();
 
-      // Resposta com plano e atividades
       res.status(201).json({
-        message: 'Questionário salvo e plano atribuído com sucesso',
+        message: 'Questionário salvo, plano atribuído e diário criado com sucesso',
         plano: {
           id: plano.id_tipo_plano,
           titulo: plano.titulo,
