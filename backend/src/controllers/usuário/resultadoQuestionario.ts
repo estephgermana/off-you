@@ -66,7 +66,7 @@ export const resultadoQuestionarioComPlano = async (req: Request, res: Response)
         data_resposta: knex.fn.now()
       });
 
-      const plano = await trx('tipo_plano_acad')
+      const plano = await trx('tipo_plano_acao')
         .where({ faixa_etaria: faixaEtaria, grau_dependencia: grau })
         .first();
 
