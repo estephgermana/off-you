@@ -74,13 +74,13 @@ export const resultadoQuestionarioComPlano = async (req: Request, res: Response)
 
       const atividades = await trx('atividade')
         .where({ id_tipo_plano: plano.id_tipo_plano })
-        .select('id_attvidade', 'titulo', 'descricao');
+        .select('id_atividade', 'titulo', 'descricao');
 
       // Inserir as atividades no diário
       const registrosDiario = atividades.map(atividade => ({
         id_diario: uuidv4(),
         id_plano: plano.id_tipo_plano,
-        id_atividade: atividade.id_attvidade,
+        id_atividade: atividade.id_atividade,
         id_usuario: usuarioId,
         comentario: null,
         data_registro: knex.fn.now(),
