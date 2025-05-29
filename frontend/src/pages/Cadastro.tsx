@@ -57,8 +57,7 @@ const Cadastro: React.FC = () => {
           const {
             grau,
             descricao,
-            pontuacao,
-            faixa_etaria
+            pontuacao
           } = JSON.parse(respostasPendentes);
 
           try {
@@ -71,8 +70,7 @@ const Cadastro: React.FC = () => {
               body: JSON.stringify({
                 grau,
                 descricao,
-                pontuacao,
-                faixa_etaria,
+                pontuacao
               }),
             });
 
