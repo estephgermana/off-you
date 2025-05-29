@@ -32,9 +32,17 @@ export const obterPlanoUsuario = async (req: Request, res: Response) => {
       .select('a.id_atividade', 'a.titulo', 'a.descricao', 'd.comentario', 'd.avaliacao', 'd.feita', 'd.data_registro');
 
     res.status(200).json({
-      plano: planoUsuario,
-      atividades
-    });
+    titulo: planoUsuario.titulo,
+    grauDependencia: planoUsuario.grau_dependencia,
+    faixaEtaria: planoUsuario.faixa_etaria,
+    id_plano: planoUsuario.id,
+    sugestoes: atividades.map(a => a.descricao),
+    atividades: atividades.map(a => ({
+      id_atividade: a.id_atividade,
+      descricao: a.descricao
+  }))
+});
+
 
   } catch (error) {
     console.error(error);
