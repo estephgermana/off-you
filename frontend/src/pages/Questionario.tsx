@@ -174,7 +174,7 @@ const Questionario: React.FC = () => {
           grau: grauCalculado.grau,
           descricao: grauCalculado.descricao,
           pontuacao: total,
-          faixa_etaria_respondida: faixaEtariaSelecionada
+          faixa_etaria: faixaEtariaSelecionada
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
