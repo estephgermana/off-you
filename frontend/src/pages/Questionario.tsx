@@ -262,7 +262,7 @@ const Questionario: React.FC = () => {
       </div>
     )}
   </div>
-);
+);}
 
 
 export default Questionario;
