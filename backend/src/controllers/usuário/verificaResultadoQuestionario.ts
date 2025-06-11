@@ -20,16 +20,13 @@ export const verificarResultadoQuestionario = async (req: Request, res: Response
 
     const resultado = await knex('resultados_questionario')
       .where({ usuario_id: usuarioId })
+      .orderBy('data_resposta', 'desc')
       .first();
 
     if (resultado) {
-      // Verifica se há atividades pendentes relacionadas ao resultado
-      const atividadesPendentes = await knex('atividades')
-        .where({
-          usuario_id: usuarioId,
-          resultado_id: resultado.id,
-          concluida: false // ou status: 'pendente', dependendo da sua estrutura
-        });
+      const atividadesPendentes = await knex('diario_atividade')
+        .where({ id_usuario: usuarioId, feita: false })
+        .andWhere('id_plano', knex.raw('(SELECT id_plano FROM diario_atividade WHERE id_usuario = ? ORDER BY data_registro DESC LIMIT 1)', [usuarioId]));
 
       const temPendencias = atividadesPendentes.length > 0;
 
@@ -50,3 +47,4 @@ export const verificarResultadoQuestionario = async (req: Request, res: Response
     res.status(500).json({ message: 'Erro ao verificar resultado do questionário.' });
   }
 };
+
