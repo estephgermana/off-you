@@ -214,7 +214,7 @@ const Questionario: React.FC = () => {
 
 return (
   <div className="questionario">
-    {carregando ? (
+     {carregando ? (
       <p>Carregando...</p>
     ) : resultadoGrau ? (
       <div className="resultado">
