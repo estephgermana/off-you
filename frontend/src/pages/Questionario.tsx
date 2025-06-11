@@ -76,32 +76,38 @@ const Questionario: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const verificarResultado = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setCarregando(false);
-        return;
-      }
+  const verificarResultado = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setCarregando(false);
+      return;
+    }
 
-      try {
-        const res = await axios.get('https://off-you.onrender.com/v1/validar_resposta_questionario', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+    try {
+      const res = await axios.get('https://off-you.onrender.com/v1/validar_resposta_questionario', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
-        if (res.data.jaRespondeu) {
+      if (res.data.jaRespondeu) {
+        if (res.data.temPendencias) {
+          // Tem atividades pendentes, não pode responder novamente
           const resultadoBackend = resultadosGerais.find(r => r.grau === res.data.resultado.grau);
           setResultadoGrau(resultadoBackend ?? resultadosGerais[0]);
-          setMensagemAPI('Você já respondeu este questionário. Novas respostas não serão salvas.');
+          setMensagemAPI('Você já respondeu este questionário e ainda possui atividades pendentes. Finalize-as antes de responder novamente.');
+        } else {
+          // Já respondeu, mas pode responder novamente
+          setMensagemAPI(null); // permite responder novamente
         }
-      } catch (err) {
-        console.error('Erro ao verificar resultado:', err);
-      } finally {
-        setCarregando(false);
       }
-    };
+    } catch (err) {
+      console.error('Erro ao verificar resultado:', err);
+    } finally {
+      setCarregando(false);
+    }
+  };
 
-    verificarResultado();
-  }, []);
+  verificarResultado();
+}, []);
 
   const handleResposta = (index: number) => {
     if (mensagemAPI) {
@@ -193,8 +199,7 @@ const Questionario: React.FC = () => {
 
   const goToPlanoDeAcao = () => {
     if (resultadoGrau && faixaEtariaSelecionada) {
-      navigate(`/plano-de-acao/${encodeURIComponent(faixaEtariaSelecionada)}`, {
-        state: { grau: resultadoGrau.grau }
+      navigate(`/plano-de-acao/`, {
       });
     }
   };

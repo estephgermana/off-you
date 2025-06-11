@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import knex from '../../connection';
 import { Authenticator } from '../../services/midleware/Authenticator';
 
-
 export const verificarResultadoQuestionario = async (req: Request, res: Response) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
@@ -24,8 +23,19 @@ export const verificarResultadoQuestionario = async (req: Request, res: Response
       .first();
 
     if (resultado) {
+      // Verifica se há atividades pendentes relacionadas ao resultado
+      const atividadesPendentes = await knex('atividades')
+        .where({
+          usuario_id: usuarioId,
+          resultado_id: resultado.id,
+          concluida: false // ou status: 'pendente', dependendo da sua estrutura
+        });
+
+      const temPendencias = atividadesPendentes.length > 0;
+
       return res.json({
         jaRespondeu: true,
+        temPendencias,
         resultado: {
           grau: resultado.grau,
           descricao: resultado.descricao,
