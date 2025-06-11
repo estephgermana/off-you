@@ -9,7 +9,7 @@ const schemaResultado = yup.object({
     .oneOf(['Uso saudável', 'Dependência leve', 'Dependência moderada', 'Dependência severa'], 'Grau inválido'),
   descricao: yup.string().required('Descrição é obrigatória'),
   pontuacao: yup.number().required('Pontuação é obrigatória').min(0).max(100),
-  faixa_etaria_respondida: yup.string()
+  faixa_etaria: yup.string()
     .required('Faixa etária respondida é obrigatória')
     .oneOf(['0-4 anos', '5-9 anos'], 'Faixa etária inválida'),
 });
@@ -65,10 +65,10 @@ export const resultadoQuestionarioComPlano = async (req: Request, res: Response)
     }
 
     const faixaEtariaCalculada = calcularFaixaEtaria(new Date(usuario.data_nascimento_vitima));
-    const { grau, descricao, pontuacao, faixa_etaria_respondida } = req.body;
+    const { grau, descricao, pontuacao, faixa_etaria } = req.body;
 
     let aviso: string | undefined;
-    if (faixaEtariaCalculada !== faixa_etaria_respondida) {
+    if (faixaEtariaCalculada !== faixa_etaria) {
       aviso = 'A faixa etária informada nas respostas difere da calculada com a data de nascimento. Os dados foram salvos, mas recomendamos revisar as informações.';
     }
 
@@ -86,7 +86,7 @@ export const resultadoQuestionarioComPlano = async (req: Request, res: Response)
       });
 
       const plano = await trx('tipo_plano_acao')
-        .where({ faixa_etaria: faixa_etaria_respondida, grau_dependencia: grau })
+        .where({ faixa_etaria: faixa_etaria, grau_dependencia: grau })
         .first();
 
       if (!plano) throw new Error('Plano não encontrado para esta faixa etária e grau');

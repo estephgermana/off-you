@@ -208,60 +208,61 @@ const Questionario: React.FC = () => {
       : respostas[indicePergunta];
 
   return (
-    <div className="questionario">
-      {mensagemAPI && (
-        <div className="alerta">
-          <strong>Atenção:</strong> {mensagemAPI}
-        </div>
-      )}
+  <div className="questionario">
+    {carregando ? (
+      <p>Carregando...</p>
+    ) : resultadoGrau ? (
+      <div className="resultado">
+        <h2>{resultadoGrau.grau}</h2>
+        <p><strong>Descrição:</strong> {resultadoGrau.descricao}</p>
+        <ul>
+          {resultadoGrau.comportamentos.map((comportamento, index) => (
+            <li key={index}>{comportamento}</li>
+          ))}
+        </ul>
 
-      {carregando ? (
-        <p>Carregando...</p>
-      ) : resultadoGrau ? (
-        <div className="resultado">
-          <h2>{resultadoGrau.grau}</h2>
-          <p><strong>Descrição:</strong> {resultadoGrau.descricao}</p>
-          <ul>
-            {resultadoGrau.comportamentos.map((comportamento, index) => (
-              <li key={index}>{comportamento}</li>
-            ))}
-          </ul>
-
-          {localStorage.getItem('token') ? (
+        {localStorage.getItem('token') ? (
+          <div className="botoes">
             <button onClick={goToPlanoDeAcao}>Ver o Plano de Ação Personalizado</button>
-          ) : (
-            <>
-              <p style={{ color: 'red', marginTop: '1rem' }}>
-                <strong>Aviso:</strong> Suas respostas ainda <u>não foram salvas</u>. Cadastre-se para salvá-las e acessar o Plano de Ação.
-              </p>
+          </div>
+        ) : (
+          <>
+            <p style={{ color: 'red', marginTop: '1rem' }}>
+              <strong>Aviso:</strong> Suas respostas ainda <u>não foram salvas</u>. Cadastre-se para salvá-las e acessar o Plano de Ação.
+            </p>
+            <div className="botoes">
               <Link to="/cadastro">
                 <button>Fazer Cadastro</button>
               </Link>
-            </>
-          )}
-        </div>
-      ) : (
-        <div className="pergunta">
-          <h3>{perguntas[indicePergunta]}</h3>
-          <div className="alternativas">
-            {getAlternativasAtuais().map((alternativa, index) => (
+            </div>
+          </>
+        )}
+      </div>
+    ) : (
+      <div className="pergunta">
+        <h3>{perguntas[indicePergunta]}</h3>
+        <div className="alternativas">
+          {getAlternativasAtuais().map((alternativa, index) => (
+            <div key={index} className="alternativa">
               <button
-                key={index}
                 className={getRespostaAtual() === index ? 'selecionada' : ''}
                 onClick={() => handleResposta(index)}
               >
                 {alternativa}
               </button>
-            ))}
-          </div>
-          <div className="navegacao">
-            {indicePergunta > 0 && <button onClick={voltarPergunta}>Voltar</button>}
-            <button onClick={proximaPergunta}>Próxima</button>
-          </div>
+            </div>
+          ))}
         </div>
-      )}
-    </div>
-  );
-};
+        <div className="botoes">
+          {indicePergunta > 0 && (
+            <button onClick={voltarPergunta}>Voltar</button>
+          )}
+          <button onClick={proximaPergunta}>Próxima</button>
+        </div>
+      </div>
+    )}
+  </div>
+);
+
 
 export default Questionario;
