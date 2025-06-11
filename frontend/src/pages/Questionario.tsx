@@ -220,18 +220,6 @@ return (
       <div className="resultado">
         <h2>{resultadoGrau.grau}</h2>
 
-        <div
-          className="barra-progresso-container"
-          aria-label={`Progresso do questionário: questão ${indicePergunta + 1} de ${perguntas.length}`}
-        >
-          <div
-            className="barra-progresso"
-            style={{ width: `${((indicePergunta + 1) / perguntas.length) * 100}%` }}
-          />
-        </div>
-
-        <p>{`Questão ${indicePergunta + 1} de ${perguntas.length}`}</p>
-
         <p><strong>Descrição:</strong> {resultadoGrau.descricao}</p>
         <p><strong>Possíveis comportamentos:</strong></p>
         <ul className="comportamentos-lista">
