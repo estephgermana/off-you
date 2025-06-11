@@ -82,6 +82,7 @@ export const resultadoQuestionarioComPlano = async (req: Request, res: Response)
         grau,
         descricao,
         pontuacao,
+        faixa_etaria,
         data_resposta: knex.fn.now()
       });
 
