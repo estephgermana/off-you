@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import knex from '../../connection';
 import { Authenticator } from '../../services/midleware/Authenticator';
 
-export const obterPlanosUsuario = async (req: Request, res: Response) => {
+export const obterPlanoUsuario = async (req: Request, res: Response) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) return res.status(401).json({ message: 'Token não fornecido' });
