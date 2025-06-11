@@ -239,3 +239,6 @@ INSERT INTO atividade (id_atividade, titulo, descricao, tipo, id_tipo_plano) VAL
 ('ceae066a-f020-4a03-9d56-fd395e9929e9', 'Atividade 6', 'Prepare-se para possíveis resistências e trabalhe com a criança e a família para entender a raiz da dependência.', '', 'fa416055-9b44-420b-b7e2-3ac61c4f13ce');
 
 select * from atividade;
+
+ALTER TABLE resultados_questionario
+ADD COLUMN faixa_etaria_respondida VARCHAR;

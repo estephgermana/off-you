@@ -22,7 +22,7 @@ interface PlanoApi {
     sugestoes: string[];
     grauDependencia: Grau;
     faixaEtaria: FaixaEtaria;
-    id_plano?: number;
+    id_plano: number;
     atividades?: { id_atividade: number; descricao: string }[];
 }
 
@@ -43,17 +43,17 @@ export default function PlanoDeAcao() {
     const payload = parseJwt(token);
     const userId = payload?.id_usuario;
 
-    const [planoAtual, setPlanoAtual] = useState<PlanoApi | null>(null);
+    // Agora armazenamos vários planos
+    const [planos, setPlanos] = useState<PlanoApi[]>([]);
+    const [planoSelecionado, setPlanoSelecionado] = useState<PlanoApi | null>(null);
+
     const [loading, setLoading] = useState(true);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const [activitiesState, setActivitiesState] = useState<ActivityState[]>([]);
     const [activeTab, setActiveTab] = useState<ActiveTab>("sugestoes");
 
-    const getStorageKey = (faixaEtaria: FaixaEtaria, grauDependencia: Grau) => {
-        const cleanFaixaEtaria = faixaEtaria.replace(/[^a-zA-Z0-9]/g, '');
-        const cleanGrauDependencia = grauDependencia.replace(/[^a-zA-Z0-9]/g, '');
-        return `registros_${cleanFaixaEtaria}_${cleanGrauDependencia}_${userId || "anon"}`;
-    };
+    // Chave localStorage por plano, usando id_plano para garantir unicidade
+    const getStorageKey = (id_plano: number) => `registros_plano_${id_plano}_${userId || "anon"}`;
 
     const createDefaultActivityState = (index: number): ActivityState => ({
         feita: false,
@@ -63,7 +63,49 @@ export default function PlanoDeAcao() {
         originalIndex: index,
     });
 
-    const fetchPlanoUsuario = async () => {
+    // Carrega atividades do plano selecionado do localStorage e mescla com dados da API
+    const carregarAtividadesDoPlano = (plano: PlanoApi) => {
+        const storageKey = getStorageKey(plano.id_plano);
+        const registroSalvo = localStorage.getItem(storageKey);
+        let initialActivities: ActivityState[] = [];
+
+        if (registroSalvo) {
+            try {
+                const progressoAtual = JSON.parse(registroSalvo);
+                if (
+                    progressoAtual &&
+                    progressoAtual.activities &&
+                    progressoAtual.planoId === plano.id_plano
+                ) {
+                    initialActivities = progressoAtual.activities.filter((activity: ActivityState) =>
+                        typeof activity.originalIndex === 'number' &&
+                        activity.originalIndex < plano.sugestoes.length
+                    );
+                }
+            } catch {
+                // ignorar erro JSON
+            }
+        }
+
+        const mergedActivities = plano.sugestoes.map((_, index) => {
+            const savedActivity = initialActivities.find(act => act.originalIndex === index);
+            const defaultActivity = createDefaultActivityState(index);
+
+            const id_atividade = plano.atividades && plano.atividades[index]?.id_atividade;
+
+            return {
+                ...defaultActivity,
+                ...savedActivity,
+                id_atividade,
+                id_plano: plano.id_plano,
+            };
+        });
+
+        setActivitiesState(mergedActivities);
+    };
+
+    // Buscar todos os planos do usuário
+    const fetchPlanosUsuario = async () => {
         if (!userId) {
             setErrorMsg("Usuário não identificado. Faça login novamente.");
             setLoading(false);
@@ -71,67 +113,45 @@ export default function PlanoDeAcao() {
         }
 
         try {
-            const response = await axios.get<PlanoApi>('https://off-you.onrender.com/v1/obterPlanoUsuario', {
+            // Atenção: Ajuste o endpoint para retornar lista de planos
+            const response = await axios.get<PlanoApi[]>('https://off-you.onrender.com/v1/obterPlanosUsuario', {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
-            const data = response.data;
+            const planosApi = response.data;
 
-            if (!data || !data.sugestoes || !data.titulo) {
-                throw new Error("Plano inválido recebido da API.");
+            if (!planosApi || planosApi.length === 0) {
+                setErrorMsg("Nenhum plano encontrado para este usuário.");
+                setLoading(false);
+                return;
             }
 
-            setPlanoAtual(data);
+            setPlanos(planosApi);
 
-            const storageKey = getStorageKey(data.faixaEtaria, data.grauDependencia);
-            const registroSalvo = localStorage.getItem(storageKey);
-            let initialActivities: ActivityState[] = [];
-
-            if (registroSalvo) {
-                try {
-                    const progressoAtual = JSON.parse(registroSalvo);
-                    if (
-                        progressoAtual &&
-                        progressoAtual.activities &&
-                        progressoAtual.grau === data.grauDependencia &&
-                        progressoAtual.faixaEtaria === data.faixaEtaria
-                    ) {
-                        initialActivities = progressoAtual.activities.filter((activity: ActivityState) =>
-                            typeof activity.originalIndex === 'number' &&
-                            activity.originalIndex < data.sugestoes.length
-                        );
-                    }
-                } catch {
-                    // ignorar erro JSON
-                }
-            }
-
-            const mergedActivities = data.sugestoes.map((_, index) => {
-                const savedActivity = initialActivities.find(act => act.originalIndex === index);
-                const defaultActivity = createDefaultActivityState(index);
-
-                const id_atividade = data.atividades && data.atividades[index]?.id_atividade;
-
-                return {
-                    ...defaultActivity,
-                    ...savedActivity,
-                    id_atividade,
-                    id_plano: data.id_plano,
-                };
-            });
-
-            setActivitiesState(mergedActivities);
+            // Seleciona o primeiro plano por padrão e carrega suas atividades
+            setPlanoSelecionado(planosApi[0]);
+            carregarAtividadesDoPlano(planosApi[0]);
 
         } catch (error: any) {
-            setErrorMsg(error.response?.data?.message || error.message || "Erro desconhecido ao carregar plano.");
+            setErrorMsg(error.response?.data?.message || error.message || "Erro desconhecido ao carregar planos.");
         } finally {
             setLoading(false);
         }
     };
 
+    // Quando muda o plano selecionado, atualizar as atividades
     useEffect(() => {
-        fetchPlanoUsuario();
+        if (planoSelecionado) {
+            carregarAtividadesDoPlano(planoSelecionado);
+            setActiveTab("sugestoes"); // resetar aba ao trocar plano
+        }
+    }, [planoSelecionado]);
+
+    useEffect(() => {
+        fetchPlanosUsuario();
     }, []);
+
+    // Funções toggle, updateComment, updateRating, saveActivity permanecem iguais, só usando activitiesState e planoSelecionado
 
     const toggleActivity = (originalIndex: number) => {
         setActivitiesState(prev => {
@@ -178,11 +198,11 @@ export default function PlanoDeAcao() {
     };
 
     const enviarAtividadeParaBackend = async (activity: ActivityState) => {
-        if (!userId || !planoAtual) {
+        if (!userId || !planoSelecionado) {
             alert("Usuário ou plano não encontrado para salvar atividade no servidor.");
             return false;
         }
-        if (activity.id_atividade == null || planoAtual.id_plano == null) {
+        if (activity.id_atividade == null || planoSelecionado.id_plano == null) {
             alert("IDs da atividade ou plano não encontrados.");
             return false;
         }
@@ -190,7 +210,7 @@ export default function PlanoDeAcao() {
         try {
             const response = await axios.post('https://off-you.onrender.com/v1/diario-atividade', {
                 id_atividade: activity.id_atividade,
-                id_plano: planoAtual.id_plano,
+                id_plano: planoSelecionado.id_plano,
                 feita: activity.feita,
                 comentario: activity.comentario,
                 avaliacao: activity.avaliacao,
@@ -214,7 +234,7 @@ export default function PlanoDeAcao() {
     };
 
     const saveActivity = async (activityToSave: ActivityState) => {
-        if (!planoAtual) return;
+        if (!planoSelecionado) return;
 
         if (!activityToSave.feita || (activityToSave.avaliacao === 0 && activityToSave.comentario.trim() === "")) {
             alert("Para salvar, marque a atividade como concluída E adicione uma avaliação/comentário.");
@@ -237,13 +257,12 @@ export default function PlanoDeAcao() {
             });
 
             const registroParaSalvar = {
-                grau: planoAtual.grauDependencia,
-                faixaEtaria: planoAtual.faixaEtaria,
+                planoId: planoSelecionado.id_plano,
                 activities: newState,
                 data: new Date().toLocaleString(),
             };
 
-            const storageKey = getStorageKey(planoAtual.faixaEtaria, planoAtual.grauDependencia);
+            const storageKey = getStorageKey(planoSelecionado.id_plano);
             localStorage.setItem(storageKey, JSON.stringify(registroParaSalvar));
             alert("Atividade salva com sucesso!");
             return newState;
@@ -251,7 +270,7 @@ export default function PlanoDeAcao() {
     };
 
     if (loading) {
-        return <div>Carregando plano de ação...</div>;
+        return <div>Carregando planos de ação...</div>;
     }
 
     if (errorMsg) {
@@ -263,7 +282,7 @@ export default function PlanoDeAcao() {
         );
     }
 
-    if (!planoAtual) {
+    if (!planoSelecionado) {
         return <div>Plano de ação não encontrado.</div>;
     }
 
@@ -275,20 +294,40 @@ export default function PlanoDeAcao() {
 
     return (
         <div className="plano-container">
-            <h2>{planoAtual.titulo}</h2>
+            <h2>Planos de Ação do Usuário</h2>
+
+            {/* Seletor de plano */}
+            <select
+                value={planoSelecionado.id_plano}
+                onChange={e => {
+                    const planoId = Number(e.target.value);
+                    const plano = planos.find(p => p.id_plano === planoId);
+                    if (plano) {
+                        setPlanoSelecionado(plano);
+                    }
+                }}
+            >
+                {planos.map(plano => (
+                    <option key={plano.id_plano} value={plano.id_plano}>
+                        {plano.titulo} — {plano.faixaEtaria} — {plano.grauDependencia}
+                    </option>
+                ))}
+            </select>
+
+            <h3>{planoSelecionado.titulo}</h3>
 
             <div className="tab-navigation">
                 <button
                     className={activeTab === "sugestoes" ? "active-tab" : ""}
                     onClick={() => setActiveTab("sugestoes")}
                 >
-                    Sugestões de Atividades ({activitiesToDisplay.filter(a => !a.saved).length})
+                    Sugestões de Atividades ({activitiesState.filter(a => !a.saved).length})
                 </button>
                 <button
                     className={activeTab === "realizadas" ? "active-tab" : ""}
                     onClick={() => setActiveTab("realizadas")}
                 >
-                    Atividades Realizadas ({activitiesToDisplay.filter(a => a.saved).length})
+                    Atividades Realizadas ({activitiesState.filter(a => a.saved).length})
                 </button>
             </div>
 
@@ -303,6 +342,12 @@ export default function PlanoDeAcao() {
                         <p>
                             Para um suporte mais aprofundado e personalizado, <b>recomendamos o acompanhamento de um profissional qualificado, como um psicólogo infantil ou pedagogo.</b> Eles podem oferecer orientações valiosas para a jornada da criança e da família.
                         </p>
+                        <div className="questionario-renovar">
+                            <p>Deseja reavaliar o nível de dependência digital?</p>
+                            <button onClick={() => navigate('/questionario')} className="botao-reavaliar">
+                                Refazer Questionário
+                            </button>
+                        </div>
                     </div>
                 )}
 
@@ -320,7 +365,7 @@ export default function PlanoDeAcao() {
 
                 {activitiesToDisplay.map((activity) => {
                     const idx = activity.originalIndex;
-                    const descricao = planoAtual.sugestoes[idx];
+                    const descricao = planoSelecionado.sugestoes[idx];
                     if (descricao === undefined) {
                         console.warn(`Descrição indefinida para originalIndex ${idx}. Pulando.`);
                         return null;

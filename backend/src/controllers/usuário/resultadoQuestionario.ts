@@ -9,7 +9,11 @@ const schemaResultado = yup.object({
     .oneOf(['Uso saudável', 'Dependência leve', 'Dependência moderada', 'Dependência severa'], 'Grau inválido'),
   descricao: yup.string().required('Descrição é obrigatória'),
   pontuacao: yup.number().required('Pontuação é obrigatória').min(0).max(100),
+  faixa_etaria_respondida: yup.string()
+    .required('Faixa etária respondida é obrigatória')
+    .oneOf(['0-4 anos', '5-9 anos'], 'Faixa etária inválida'),
 });
+
 
 function calcularFaixaEtaria(dataNascimento: Date): string {
   const hoje = new Date();
@@ -33,12 +37,22 @@ export const resultadoQuestionarioComPlano = async (req: Request, res: Response)
 
     const usuarioId = payload.id_usuario;
 
-    const respostaExistente = await knex('resultados_questionario')
+    const respostaAnterior = await knex('resultados_questionario')
       .where({ usuario_id: usuarioId })
+      .orderBy('data_resposta', 'desc')
       .first();
 
-    if (respostaExistente) {
-      return res.status(400).json({ message: 'Você já respondeu o questionário.' });
+    if (respostaAnterior) {
+      const atividadesPendentes = await knex('diario_atividade')
+        .where({ id_usuario: usuarioId })
+        .andWhere('feita', false)
+        .andWhere('id_plano', knex.raw('(SELECT id_plano FROM diario_atividade WHERE id_usuario = ? ORDER BY data_registro DESC LIMIT 1)', [usuarioId]));
+
+      if (atividadesPendentes.length > 0) {
+        return res.status(400).json({ 
+          message: 'Você já respondeu o questionário e ainda possui atividades pendentes do plano atual.' 
+        });
+      }
     }
 
     const usuario = await knex('usuario')
@@ -50,8 +64,13 @@ export const resultadoQuestionarioComPlano = async (req: Request, res: Response)
       return res.status(400).json({ message: 'Data de nascimento não cadastrada.' });
     }
 
-    const faixaEtaria = calcularFaixaEtaria(new Date(usuario.data_nascimento_vitima));
-    const { grau, descricao, pontuacao } = req.body;
+    const faixaEtariaCalculada = calcularFaixaEtaria(new Date(usuario.data_nascimento_vitima));
+    const { grau, descricao, pontuacao, faixa_etaria_respondida } = req.body;
+
+    let aviso: string | undefined;
+    if (faixaEtariaCalculada !== faixa_etaria_respondida) {
+      aviso = 'A faixa etária informada nas respostas difere da calculada com a data de nascimento. Os dados foram salvos, mas recomendamos revisar as informações.';
+    }
 
     const trx = await knex.transaction();
 
@@ -67,7 +86,7 @@ export const resultadoQuestionarioComPlano = async (req: Request, res: Response)
       });
 
       const plano = await trx('tipo_plano_acao')
-        .where({ faixa_etaria: faixaEtaria, grau_dependencia: grau })
+        .where({ faixa_etaria: faixa_etaria_respondida, grau_dependencia: grau })
         .first();
 
       if (!plano) throw new Error('Plano não encontrado para esta faixa etária e grau');
@@ -76,7 +95,6 @@ export const resultadoQuestionarioComPlano = async (req: Request, res: Response)
         .where({ id_tipo_plano: plano.id_tipo_plano })
         .select('id_atividade', 'titulo', 'descricao');
 
-      // Inserir as atividades no diário
       const registrosDiario = atividades.map(atividade => ({
         id_diario: uuidv4(),
         id_plano: plano.id_tipo_plano,
@@ -100,7 +118,8 @@ export const resultadoQuestionarioComPlano = async (req: Request, res: Response)
           faixa_etaria: plano.faixa_etaria,
           grau_dependencia: plano.grau_dependencia
         },
-        atividades
+        atividades,
+        ...(aviso && { aviso })
       });
 
     } catch (error) {
