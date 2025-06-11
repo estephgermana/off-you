@@ -114,7 +114,7 @@ export default function PlanoDeAcao() {
 
         try {
             // Atenção: Ajuste o endpoint para retornar lista de planos
-            const response = await axios.get<PlanoApi[]>('https://off-you.onrender.com/v1/obterPlanosUsuario', {
+            const response = await axios.get<PlanoApi[]>('https://off-you.onrender.com/v1/obterPlanoUsuario', {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
