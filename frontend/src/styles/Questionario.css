@@ -5,6 +5,7 @@
   background: #f8f8ff;
   border-radius: 10px;
   font-family: Arial, sans-serif;
+  color: #333;
 }
 
 h2 {
@@ -21,6 +22,7 @@ h2 {
   display: block;
   margin: 10px 0;
   font-size: 16px;
+  cursor: pointer;
 }
 
 .alternativa input {
@@ -46,6 +48,11 @@ button {
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover:not(:disabled) {
+  background-color: #7a5e82;
 }
 
 button:disabled {
@@ -55,16 +62,60 @@ button:disabled {
 
 .resultado {
   padding: 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   text-align: left;
+  margin-top: 20px;
+  color: #444;
+}
+
+.resultado h2 {
+  color: #253173;
+  margin-bottom: 10px;
 }
 
 .resultado ul {
   list-style: disc;
   padding-left: 20px;
+  margin-bottom: 15px;
 }
 
 .frase-final {
   margin: 20px 0;
   font-style: italic;
-  color: #333;
+  color: #555;
+}
+
+/* Aviso de cadastro em vermelho, mais suave */
+.aviso-cadastro {
+  color: #c0392b;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Botões exclusivos para resultado */
+.btn-acesso-plano,
+.btn-cadastro {
+  background-color: #253173;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.btn-acesso-plano:hover,
+.btn-cadastro:hover {
+  background-color: #1a2552;
+}
+
+/* Centralizar botões no resultado */
+.resultado button {
+  display: block;
+  margin: 0 auto;
 }

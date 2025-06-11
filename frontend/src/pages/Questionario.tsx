@@ -207,7 +207,7 @@ const Questionario: React.FC = () => {
       ? faixaEtariaSelecionada !== null ? alternativasFaixaEtaria.indexOf(faixaEtariaSelecionada) : -1
       : respostas[indicePergunta];
 
-  return (
+return (
   <div className="questionario">
     {carregando ? (
       <p>Carregando...</p>
@@ -215,54 +215,35 @@ const Questionario: React.FC = () => {
       <div className="resultado">
         <h2>{resultadoGrau.grau}</h2>
         <p><strong>Descrição:</strong> {resultadoGrau.descricao}</p>
-        <ul>
+        <p><strong>Possíveis comportamentos:</strong></p>
+        <ul className="comportamentos-lista">
           {resultadoGrau.comportamentos.map((comportamento, index) => (
             <li key={index}>{comportamento}</li>
           ))}
         </ul>
+        <p className="frase-final">
+          Confira sugestões de atividades mais completas para ajudar seu amigo ou familiar:
+        </p>
 
         {localStorage.getItem('token') ? (
-          <div className="botoes">
-            <button onClick={goToPlanoDeAcao}>Ver o Plano de Ação Personalizado</button>
-          </div>
+          <button className="btn-acesso-plano" onClick={goToPlanoDeAcao}>
+            Ver o Plano de Ação Personalizado
+          </button>
         ) : (
           <>
-            <p style={{ color: 'red', marginTop: '1rem' }}>
+            <p className="aviso-cadastro">
               <strong>Aviso:</strong> Suas respostas ainda <u>não foram salvas</u>. Cadastre-se para salvá-las e acessar o Plano de Ação.
             </p>
-            <div className="botoes">
-              <Link to="/cadastro">
-                <button>Fazer Cadastro</button>
-              </Link>
-            </div>
+            <Link to="/cadastro">
+              <button className="btn-cadastro">Cadastre-se para salvar as respostas</button>
+            </Link>
           </>
         )}
       </div>
-    ) : (
-      <div className="pergunta">
-        <h3>{perguntas[indicePergunta]}</h3>
-        <div className="alternativas">
-          {getAlternativasAtuais().map((alternativa, index) => (
-            <div key={index} className="alternativa">
-              <button
-                className={getRespostaAtual() === index ? 'selecionada' : ''}
-                onClick={() => handleResposta(index)}
-              >
-                {alternativa}
-              </button>
-            </div>
-          ))}
-        </div>
-        <div className="botoes">
-          {indicePergunta > 0 && (
-            <button onClick={voltarPergunta}>Voltar</button>
-          )}
-          <button onClick={proximaPergunta}>Próxima</button>
-        </div>
-      </div>
-    )}
+    ) : null}
   </div>
-);}
+);
+}
 
 
 export default Questionario;
