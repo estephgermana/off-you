@@ -26,8 +26,6 @@ function calcularFaixaEtaria(dataNascimento: Date): string {
 
 export const resultadoQuestionarioComPlano = async (req: Request, res: Response) => {
   try {
-    await schemaResultado.validate(req.body, { abortEarly: false });
-
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) return res.status(401).json({ message: 'Token não fornecido' });
 
@@ -67,10 +65,15 @@ export const resultadoQuestionarioComPlano = async (req: Request, res: Response)
     const faixaEtariaCalculada = calcularFaixaEtaria(new Date(usuario.data_nascimento_vitima));
     const { grau, descricao, pontuacao, faixa_etaria } = req.body;
 
+    req.body.faixa_etaria = faixaEtariaCalculada;
+
+
     let aviso: string | undefined;
     if (faixaEtariaCalculada !== faixa_etaria) {
       aviso = 'A faixa etária informada nas respostas difere da calculada com a data de nascimento. Os dados foram salvos, mas recomendamos revisar as informações.';
     }
+
+    await schemaResultado.validate(req.body, { abortEarly: false });
 
     const trx = await knex.transaction();
 
