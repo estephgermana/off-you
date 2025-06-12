@@ -15,9 +15,7 @@ const Header: React.FC = () => {
           <img src={logo} alt="Logo OffYou" className="logo-image" />
         </div>
 
-        <div className="search-bar">
-          <input type="text" placeholder="Buscar..." />
-        </div>
+      
 
         {logado ? (
           <button

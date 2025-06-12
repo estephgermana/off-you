@@ -19,7 +19,6 @@ h2 {
 }
 
 .alternativa {
-  display: block;
   margin: 10px 0;
   font-size: 16px;
   cursor: pointer;
@@ -121,14 +120,16 @@ button:disabled {
 }
 
 .alternativas {
-  display: flex;
+  display: block;
+  align-content: center;
+  align-items: center;
   flex-direction: column;
   gap: 12px;
   margin-bottom: 20px;
 }
 
 .alternativa {
-  display: flex;
+  display: block;
   align-items: center;
   cursor: pointer;
   border: 2px solid transparent;
@@ -139,7 +140,6 @@ button:disabled {
 }
 
 .alternativa:hover {
-  border-color: #94749e;
   background-color: #e8e4f1;
 }
 
@@ -147,19 +147,33 @@ button:disabled {
   display: none;
 }
 
-.alternativa input[type="radio"]:checked + span {
-  border-color: #253173;
-  background-color: #d6d9f7;
-  font-weight: 600;
-  color: #253173;
-  box-shadow: 0 0 8px rgba(37, 49, 115, 0.5);
-  border-radius: 10px;
-  padding: 12px 20px;
-}
+
 
 .alternativa span {
   flex: 1;
   display: block;
   padding: 8px 12px;
   border-radius: 10px;
+}
+
+.progresso {
+  height: 10px;
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.barra-progresso-container {
+  height: 10px;
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.barra-progresso {
+  height: 100%;
+  background-color: #7a5e82;
+  transition: width 0.3s ease;
 }

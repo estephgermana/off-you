@@ -225,7 +225,7 @@ return (
             <li key={index}>{comportamento}</li>
           ))}
         </ul>
-
+        
         {localStorage.getItem('token') ? (
           <div className="botoes">
             <button onClick={goToPlanoDeAcao}>Ver o Plano de Ação Personalizado</button>
@@ -246,15 +246,23 @@ return (
     ) : (
       <div className="pergunta">
         <h3>{perguntas[indicePergunta]}</h3>
+         <div className="barra-progresso-container">
+    <div
+      className="barra-progresso"
+      style={{
+        width: `${(indicePergunta / (perguntas.length - 1)) * 100}%`,
+      }}
+    ></div>
+  </div>
         <div className="alternativas">
           {getAlternativasAtuais().map((alternativa, index) => (
-            <div key={index} className="alternativa">
-              <button
+            <div key={index} className="alternativa" role="button">
+              <p
                 className={getRespostaAtual() === index ? 'selecionada' : ''}
                 onClick={() => handleResposta(index)}
               >
                 {alternativa}
-              </button>
+              </p>
             </div>
           ))}
         </div>

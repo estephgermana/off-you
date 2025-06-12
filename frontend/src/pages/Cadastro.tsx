@@ -21,7 +21,7 @@ const Cadastro: React.FC = () => {
       return;
     }
 
-    if (senha !== confirmarSenha) {
+    if (senha.trim() !== confirmarSenha.trim()) {
       setError('As senhas não coincidem.');
       return;
     }
