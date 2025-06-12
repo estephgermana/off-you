@@ -63,10 +63,10 @@ export const resultadoQuestionarioComPlano = async (req: Request, res: Response)
     }
 
     const faixaEtariaCalculada = calcularFaixaEtaria(new Date(usuario.data_nascimento_vitima));
-    const { grau, descricao, pontuacao, faixa_etaria } = req.body;
 
     req.body.faixa_etaria = faixaEtariaCalculada;
 
+    const { grau, descricao, pontuacao, faixa_etaria } = req.body;
 
     let aviso: string | undefined;
     if (faixaEtariaCalculada !== faixa_etaria) {
