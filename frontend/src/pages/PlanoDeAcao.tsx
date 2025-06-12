@@ -304,7 +304,7 @@ export default function PlanoDeAcao() {
                     const plano = planos.find(p => p.id_plano === planoId);
                     if (plano) {
                     setPlanoSelecionado(plano);
-                    setActiveTab("sugestoes"); // Pode deixar aqui, pois muda junto com o plano
+                    setActiveTab("sugestoes"); 
                     }
                 }}
                 >
