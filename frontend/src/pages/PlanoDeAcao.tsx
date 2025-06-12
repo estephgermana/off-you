@@ -298,17 +298,17 @@ export default function PlanoDeAcao() {
 
             {/* Seletor de plano */}
             <select
-                value={planoSelecionado.id_plano}
+                value={planoSelecionado?.id_plano || ""}
                 onChange={e => {
-                     const planoId = Number(e.target.value);
+                    const planoId = Number(e.target.value);
                     const plano = planos.find(p => p.id_plano === planoId);
                     if (plano) {
-                        setPlanoSelecionado(plano);
-                        carregarAtividadesDoPlano(plano);
-                        setActiveTab("sugestoes"); 
+                    setPlanoSelecionado(plano);
+                    setActiveTab("sugestoes"); // Pode deixar aqui, pois muda junto com o plano
                     }
                 }}
-            >
+                >
+
                 {planos.map(plano => (
                     <option key={plano.id_plano} value={plano.id_plano}>
                         {plano.titulo} — {plano.faixaEtaria} — {plano.grauDependencia}
