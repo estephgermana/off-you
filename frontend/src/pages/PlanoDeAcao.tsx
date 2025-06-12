@@ -300,10 +300,12 @@ export default function PlanoDeAcao() {
             <select
                 value={planoSelecionado.id_plano}
                 onChange={e => {
-                    const planoId = Number(e.target.value);
+                     const planoId = Number(e.target.value);
                     const plano = planos.find(p => p.id_plano === planoId);
                     if (plano) {
                         setPlanoSelecionado(plano);
+                        carregarAtividadesDoPlano(plano);
+                        setActiveTab("sugestoes"); 
                     }
                 }}
             >
