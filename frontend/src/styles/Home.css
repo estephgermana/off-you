@@ -1,79 +1,108 @@
-
 .questionario-box {
-    width: 800px;
-    height: 250px;
-    border-radius: 20px;
-    background: #6C87A3;
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    color: white;
-    margin: 40px auto;
-  }
-  
-  .questionario-box h1 {
-    font-size: 1.7rem;
-    color: white;
-    margin: 0;
-    text-align: center;
-  }
-  
-  .questionario-box h3 {
-    font-size: 1.2rem;
-    color: white;
-    margin: 10px 0 10px 0;
-    text-align: center;
-  }
-  
+  max-width: 90vw;       
+  width: 800px;          
+  height: auto;          
+  min-height: 250px;     
+  border-radius: 20px;
+  background: linear-gradient(135deg, #6c87a3 0%, #4b6075 100%); /* degrade sutil */
+  padding: 30px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  color: white;
+  margin: 40px auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  gap: 15px;
+}
 
-  .start-button {
-    background-color: #94749e; 
-    color: white;
-    font-size: 1.2rem;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    text-decoration: none;
-  }
-  
-  .start-button:hover {
-    background-color: #e06d96; 
-  }
-  
-  .start-button:focus {
-    outline: none;
-  }
-  .sobre-offyou {
+.questionario-box h1 {
+  font-size: clamp(1.5rem, 4vw, 2rem); /* escala responsiva */
+  margin: 0;
+  font-weight: 700;
+}
+
+.questionario-box h3 {
+  font-size: clamp(1rem, 3vw, 1.3rem);
+  margin: 10px 0;
+  font-weight: 500;
+}
+
+.start-button {
+  background-color: #94749e; 
+  color: white;
+  font-size: 1.2rem;
+  padding: 12px 35px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  text-decoration: none;
+  box-shadow: 0 4px 8px rgba(148, 116, 158, 0.5);
+  user-select: none;
+}
+
+.start-button:hover {
+  background-color: #e06d96; 
+  transform: scale(1.05);
+}
+
+.start-button:focus {
+  outline: 2px solid #f7a7c1;
+  outline-offset: 3px;
+}
+
+.sobre-offyou {
   background-color: #f2f2f2;
   border-radius: 15px;
-  padding: 20px;
-  margin-top: 30px;
-  
-
+  padding: 25px 30px;
+  margin: 40px auto;
+  max-width: 90vw;
+  width: 80%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  width: 80%;  
-  margin: 40px auto; 
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  gap: 15px;
 }
 
 .sobre-offyou h2 {
-  font-size: 2rem;
+  font-size: clamp(1.6rem, 5vw, 2.2rem);
   color: #253173;
   margin-bottom: 10px;
+  font-weight: 700;
 }
 
 .sobre-offyou p {
-  font-size: 1rem;
-  color: #666;
+  font-size: clamp(0.9rem, 3vw, 1rem);
+  color: #555;
   line-height: 1.7;
-  width: 80%; 
+  max-width: 700px;
   margin: 0 auto;
+}
+
+/* Media query para telas pequenas (mobile) */
+@media (max-width: 480px) {
+  .questionario-box {
+    padding: 20px 25px;
+    border-radius: 15px;
+  }
+
+  .start-button {
+    font-size: 1rem;
+    padding: 10px 25px;
+  }
+
+  .sobre-offyou {
+    padding: 20px 15px;
+    width: 95%;
+  }
+
+  .sobre-offyou p {
+    max-width: 100%;
+  }
 }
